@@ -5,6 +5,8 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+import com.example.android.popularmovies.MainActivity;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -20,7 +22,7 @@ public final class NetworkUtils {
 
     private final static String TAG = NetworkUtils.class.getName();
 
-    private final static String API_KEY = "MUST BE YOUR KEY";
+//    private final static String API_KEY = "API_KEY";
 
     private final static String BASE_URL = "https://api.themoviedb.org/3/movie/";
     private final static String IMAGE_URL = "http://image.tmdb.org/t/p/w185//";
@@ -40,7 +42,7 @@ public final class NetworkUtils {
             baseUrl = BASE_URL.concat("top_rated");
         }
         Uri buildUri = Uri.parse(baseUrl).buildUpon()
-                .appendQueryParameter(API_PARAM, API_KEY)
+                .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
                 .build();
 
         Log.d(TAG, "The requested url: " + buildUri.toString());

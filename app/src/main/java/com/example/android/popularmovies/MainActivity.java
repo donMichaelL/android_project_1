@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private static final String TAG = MainActivity.class.getName();
 
+    public static String API_KEY ;
+
     public static final String MOVIE_TAG = "movieObj";
     private static final String MOVIE_ARRAY_LIST = "movie_list";
 
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        API_KEY = getResources().getString(R.string.secret_api);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
