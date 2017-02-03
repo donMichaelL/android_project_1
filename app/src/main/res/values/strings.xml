@@ -3,4 +3,7 @@
     <string name="error_msg">An Error Occurred.... Check your Internet Connection</string>
     <string name="rating">Rating</string>
     <string name="release_d">Release Date</string>
+    <string name="only_videos_youtube">Sorry Only YouTube Videos</string>
+    <string name="download_app">Visit app store to download youTube app or a web browser</string>
+
 </resources>

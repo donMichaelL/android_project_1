@@ -33,6 +33,10 @@ public final class NetworkUtils {
     public final static String ORDERING_POPULARITY = "popularity";
     public final static String ORDERING_VOTES = "vote_average";
 
+    public final static String YOUTUBE = "https://www.youtube.com/watch";
+    public final static String YOUTUBE_WATCH = "v";
+
+
 
     public static URL buildUrlForQueryOrderingMovieDB(String orderingParam) {
         String baseUrl;
@@ -83,6 +87,18 @@ public final class NetworkUtils {
         return imageUrl;
     }
 
+
+    public static Uri buildUrlForVideo(String site, String key){
+        if (! site.equals("YouTube")) {
+            return null;
+        }
+
+        Uri buildUri = Uri.parse(YOUTUBE).buildUpon()
+                .appendQueryParameter(YOUTUBE_WATCH, key)
+                .build();
+
+        return buildUri;
+    }
 
     public static String getResponseFromHttpUrl(URL url) throws IOException{
         Log.d(TAG, "Trying to connect and get Data from " + url.toString());

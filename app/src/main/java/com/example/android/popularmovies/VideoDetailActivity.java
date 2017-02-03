@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.MovieAdapter.MovieAdapter;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
@@ -93,6 +95,19 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
     @Override
     public void onListItemClick(int clickedItemIndex) {
         Log.d(TAG, videoArrayList.get(clickedItemIndex).getName());
+        Video video = videoArrayList.get(clickedItemIndex);
+        Uri sendingUri = NetworkUtils.buildUrlForVideo(video.getSite(), video.getKey());
+        if (sendingUri != null){
+            Intent intent = new Intent(Intent.ACTION_VIEW, sendingUri);
+            if (intent.resolveActivity(getPackageManager()) != null){
+                startActivity(intent);
+            }else {
+                Toast.makeText(this, R.string.download_app, Toast.LENGTH_SHORT).show();
+
+            }
+        } else {
+            Toast.makeText(this, R.string.only_videos_youtube, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private class MovieDBVideoQueryTask extends AsyncTask<URL, Void, ArrayList<Video>>{
