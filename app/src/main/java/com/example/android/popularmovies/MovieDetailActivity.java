@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
@@ -15,6 +17,8 @@ import com.squareup.picasso.Picasso;
 public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getName();
 
+    public static final String MOVIE_ID = "movie_id";
+
     private ImageView headerImage;
     private ImageView thumbnail;
     private TextView originalTitle;
@@ -22,6 +26,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private TextView tvRating;
     private TextView tvReleaseDate;
+    private Button btnVideoDetailActivity;
 
 
     @Override
@@ -29,7 +34,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         Intent intent = getIntent();
-        Movie selectedMovie = intent.getParcelableExtra(MainActivity.MOVIE_TAG);
+        final Movie selectedMovie = intent.getParcelableExtra(MainActivity.MOVIE_TAG);
         Log.d(TAG, "DetailActivity started with Movie " + selectedMovie.getTitle());
 
         headerImage = (ImageView) findViewById(R.id.header_image);
@@ -39,6 +44,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvReleaseDate = (TextView) findViewById(R.id.tv_release_date);
         tvRating = (TextView) findViewById(R.id.tv_rating);
         ratingBar = (RatingBar) findViewById(R.id.rating_bar);
+        btnVideoDetailActivity = (Button) findViewById(R.id.btn_video_detail_activity);
+
 
         Picasso.with(this).load(NetworkUtils.buildUrlForImages(selectedMovie.getBackdropPath()).toString()).into(headerImage);
         Picasso.with(this).load(NetworkUtils.buildUrlForImages(selectedMovie.getPosterPath()).toString()).into(thumbnail);
@@ -47,6 +54,16 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvReleaseDate.setText(selectedMovie.getReleaseDate());
         ratingBar.setRating(returnRatingBase5(selectedMovie.getVoteAverage()));
         tvRating.setText(returnRatingString(selectedMovie.getVoteAverage()));
+
+        btnVideoDetailActivity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(MovieDetailActivity.this, VideoDetailActivity.class);
+                intent1.putExtra(MOVIE_ID, selectedMovie.getId());
+                startActivity(intent1);
+            }
+        });
+
         Log.d(TAG, "DetailActivity started with Movie " + selectedMovie.getVoteAverage());
     }
 

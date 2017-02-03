@@ -52,7 +52,6 @@ public class Movie implements Parcelable{
         originalTitle = in.readString();
         originalLanguage = in.readString();
         overview = in.readString();
-        Log.d("HELLo", "HERE IS pareceable" + overview);
         popularity = in.readInt();
         voteCount = in.readInt();
         voteAverage = in.readInt();
