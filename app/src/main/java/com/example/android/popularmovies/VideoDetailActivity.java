@@ -5,19 +5,20 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import com.example.android.popularmovies.Movies.MoviesParser;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.Video.Video;
 import com.example.android.popularmovies.Video.VideoParser;
+import com.example.android.popularmovies.VideoAdapter.VideoAdapter;
 
-import org.json.JSONException;
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -26,8 +27,13 @@ public class VideoDetailActivity extends AppCompatActivity {
 
     private static final String VIDEO_ARRAY_LIST = "video_list";
 
-
     private ArrayList<Video> videoArrayList;
+    private VideoAdapter videoAdapter;
+
+    private RecyclerView videoRecyclerView;
+    private TextView tvErrorMsg;
+    private ProgressBar pgLoading;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,21 +45,41 @@ public class VideoDetailActivity extends AppCompatActivity {
         }
         Integer id = getIntent().getIntExtra(MovieDetailActivity.MOVIE_ID, 0);
 
-        //TODO check if saved Instances
+        videoRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_video);
+        tvErrorMsg = (TextView) findViewById(R.id.tv_error_msg_video);
+        pgLoading = (ProgressBar) findViewById(R.id.pg_loading_video);
+
+        videoAdapter = new VideoAdapter();
+        videoRecyclerView.setLayoutManager(
+                new LinearLayoutManager(getBaseContext(),LinearLayoutManager.VERTICAL, false));
+
+        videoRecyclerView.setAdapter(videoAdapter);
+
         if(savedInstanceState == null || !savedInstanceState.containsKey(VIDEO_ARRAY_LIST)) {
             createAnyncTasForVideoMovieData(id);
         } else {
             videoArrayList = savedInstanceState.getParcelableArrayList(VIDEO_ARRAY_LIST);
+            videoAdapter.setArrayAdapter(videoArrayList);
         }
     }
 
     private void createAnyncTasForVideoMovieData(Integer id) {
         if (isOnline()){
             URL requestUrl = NetworkUtils.buildUrlForMovieVideoMovieDB(id);
-            new MovieDBVideoQueyTask().execute(requestUrl);
+            new MovieDBVideoQueryTask().execute(requestUrl);
         }else {
-            //TODO showErrorMsg()
+            showErrorMsg();
         }
+    }
+
+    private void showErrorMsg(){
+        videoRecyclerView.setVisibility(View.INVISIBLE);
+        tvErrorMsg.setVisibility(View.VISIBLE);
+    }
+
+    private void showVideoData(){
+        videoRecyclerView.setVisibility(View.VISIBLE);
+        tvErrorMsg.setVisibility(View.INVISIBLE);
     }
 
     private boolean isOnline() {
@@ -63,7 +89,7 @@ public class VideoDetailActivity extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private class MovieDBVideoQueyTask extends AsyncTask<URL, Void, ArrayList<Video>>{
+    private class MovieDBVideoQueryTask extends AsyncTask<URL, Void, ArrayList<Video>>{
 
         @Override
         protected ArrayList<Video> doInBackground(URL... params) {
@@ -72,12 +98,24 @@ public class VideoDetailActivity extends AppCompatActivity {
             try {
                 String responseString = NetworkUtils.getResponseFromHttpUrl(requestUrl);
                 videoArrayList = VideoParser.createVideoArrayFromStringJson(responseString);
-                Log.d(TAG, videoArrayList.get(0).getName());
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
-            return null;
+            return videoArrayList;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Video> videoArrayList) {
+            pgLoading.setVisibility(View.INVISIBLE);
+            if (videoArrayList != null){
+                Log.d(TAG, "Data received with success");
+                videoAdapter.setArrayAdapter(videoArrayList);
+                showVideoData();
+            } else {
+                Log.d(TAG, "ERRORRRRRR");
+                showErrorMsg();
+            }
         }
     }
 
