@@ -18,10 +18,18 @@ import java.util.ArrayList;
 public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoAdapterViewHolder>{
     private static final String TAG = VideoAdapter.class.getName();
 
+    private final ListItemClickListener mOnClickListener;
+
     private ArrayList<Video> videoArrayList;
 
 
-    public VideoAdapter() {
+    public interface ListItemClickListener {
+        void onListItemClick(int clickedItemIndex);
+    }
+
+
+    public VideoAdapter(ListItemClickListener mOnClickListener) {
+        this.mOnClickListener = mOnClickListener;
     }
 
     @Override
@@ -43,12 +51,18 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoAdapter
         return videoArrayList.size();
     }
 
-    public class VideoAdapterViewHolder extends RecyclerView.ViewHolder{
+    public class VideoAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView tvTitle;
 
         public VideoAdapterViewHolder(View itemView) {
             super(itemView);
             tvTitle = (TextView) itemView.findViewById(R.id.video_item_id);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            mOnClickListener.onListItemClick(getAdapterPosition());
         }
     }
 

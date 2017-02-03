@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.MovieAdapter.MovieAdapter;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.Video.Video;
 import com.example.android.popularmovies.Video.VideoParser;
@@ -22,7 +23,7 @@ import com.example.android.popularmovies.VideoAdapter.VideoAdapter;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class VideoDetailActivity extends AppCompatActivity {
+public class VideoDetailActivity extends AppCompatActivity implements VideoAdapter.ListItemClickListener {
     private static final String TAG = VideoDetailActivity.class.getName();
 
     private static final String VIDEO_ARRAY_LIST = "video_list";
@@ -49,7 +50,7 @@ public class VideoDetailActivity extends AppCompatActivity {
         tvErrorMsg = (TextView) findViewById(R.id.tv_error_msg_video);
         pgLoading = (ProgressBar) findViewById(R.id.pg_loading_video);
 
-        videoAdapter = new VideoAdapter();
+        videoAdapter = new VideoAdapter(this);
         videoRecyclerView.setLayoutManager(
                 new LinearLayoutManager(getBaseContext(),LinearLayoutManager.VERTICAL, false));
 
@@ -89,6 +90,11 @@ public class VideoDetailActivity extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        Log.d(TAG, videoArrayList.get(clickedItemIndex).getName());
+    }
+
     private class MovieDBVideoQueryTask extends AsyncTask<URL, Void, ArrayList<Video>>{
 
         @Override
@@ -113,7 +119,6 @@ public class VideoDetailActivity extends AppCompatActivity {
                 videoAdapter.setArrayAdapter(videoArrayList);
                 showVideoData();
             } else {
-                Log.d(TAG, "ERRORRRRRR");
                 showErrorMsg();
             }
         }
