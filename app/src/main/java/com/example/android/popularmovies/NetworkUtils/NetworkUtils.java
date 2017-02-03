@@ -56,8 +56,24 @@ public final class NetworkUtils {
         return returnedUrl;
     }
 
+    public static URL buildUrlForMovieVideoMovieDB(int id){
+        String baseUrl = BASE_URL + Integer.toString(id) + "/videos";
+        Uri buildUri = Uri.parse(baseUrl).buildUpon()
+                .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
+                .build();
+
+        Log.d(TAG, "The requested url:" + buildUri.toString());
+
+        URL returnedUrl = null;
+        try {
+            returnedUrl = new URL(buildUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return  returnedUrl;
+    }
+
     public static URL buildUrlForImages(String imageExtention){
-        /* Example http://image.tmdb.org/t/p/w185//nBNZadXqJSdt05SHLqgT0HuC5Gm.jpg  */
         URL imageUrl = null;
         try {
             imageUrl = new URL(IMAGE_URL.concat(imageExtention));
