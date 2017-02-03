@@ -24,6 +24,11 @@ import java.util.ArrayList;
 public class VideoDetailActivity extends AppCompatActivity {
     private static final String TAG = VideoDetailActivity.class.getName();
 
+    private static final String VIDEO_ARRAY_LIST = "video_list";
+
+
+    private ArrayList<Video> videoArrayList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,14 +39,23 @@ public class VideoDetailActivity extends AppCompatActivity {
         }
         Integer id = getIntent().getIntExtra(MovieDetailActivity.MOVIE_ID, 0);
 
+        //TODO check if saved Instances
+        if(savedInstanceState == null || !savedInstanceState.containsKey(VIDEO_ARRAY_LIST)) {
+            createAnyncTasForVideoMovieData(id);
+        } else {
+            videoArrayList = savedInstanceState.getParcelableArrayList(VIDEO_ARRAY_LIST);
+        }
+    }
+
+    private void createAnyncTasForVideoMovieData(Integer id) {
         if (isOnline()){
             URL requestUrl = NetworkUtils.buildUrlForMovieVideoMovieDB(id);
             new MovieDBVideoQueyTask().execute(requestUrl);
         }else {
             //TODO showErrorMsg()
         }
-
     }
+
     private boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -57,7 +71,7 @@ public class VideoDetailActivity extends AppCompatActivity {
             URL requestUrl = params[0];
             try {
                 String responseString = NetworkUtils.getResponseFromHttpUrl(requestUrl);
-                ArrayList<Video> videoArrayList = VideoParser.createVideoArrayFromStringJson(responseString);
+                videoArrayList = VideoParser.createVideoArrayFromStringJson(responseString);
                 Log.d(TAG, videoArrayList.get(0).getName());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -65,5 +79,11 @@ public class VideoDetailActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(VIDEO_ARRAY_LIST, videoArrayList);
+        super.onSaveInstanceState(outState);
     }
 }
