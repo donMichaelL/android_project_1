@@ -3,10 +3,12 @@ package com.example.android.popularmovies;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
@@ -28,6 +30,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tvReleaseDate;
     private Button btnVideoDetailActivity;
 
+    private RecyclerView recyclerView;
+    private TextView tvErrorMsgReview;
+    private ProgressBar pgLoadingReview;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,10 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvRating = (TextView) findViewById(R.id.tv_rating);
         ratingBar = (RatingBar) findViewById(R.id.rating_bar);
         btnVideoDetailActivity = (Button) findViewById(R.id.btn_video_detail_activity);
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_reviews);
+        tvErrorMsgReview = (TextView) findViewById(R.id.tv_error_msg_review);
+        pgLoadingReview = (ProgressBar) findViewById(R.id.pg_loading_review);
 
 
         Picasso.with(this).load(NetworkUtils.buildUrlForImages(selectedMovie.getBackdropPath()).toString()).into(headerImage);
