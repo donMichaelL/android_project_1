@@ -24,7 +24,6 @@ import com.example.android.popularmovies.Reviews.ReviewParser;
 import com.example.android.popularmovies.ReviewsAdapter.ReviewAdapter;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -33,6 +32,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     public static final String MOVIE_ID = "movie_id";
     private static final String REVIEW_ARRAY_LIST_LABEL ="review_array_list";
+    private static final int NO_COMMENT = 0;
 
     private ImageView headerImage;
     private ImageView thumbnail;
@@ -43,6 +43,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tvReleaseDate;
     private Button btnVideoDetailActivity;
     private RecyclerView recyclerView;
+    private TextView tvNoComments;
     private TextView tvErrorMsgReview;
     private ProgressBar pgLoadingReview;
 
@@ -66,6 +67,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         ratingBar = (RatingBar) findViewById(R.id.rating_bar);
         btnVideoDetailActivity = (Button) findViewById(R.id.btn_video_detail_activity);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerview_reviews);
+        tvNoComments = (TextView) findViewById(R.id.tv_no_comments);
         tvErrorMsgReview = (TextView) findViewById(R.id.tv_error_msg_review);
         pgLoadingReview = (ProgressBar) findViewById(R.id.pg_loading_review);
 
@@ -152,7 +154,11 @@ public class MovieDetailActivity extends AppCompatActivity {
         protected void onPostExecute(ArrayList<Review> reviews) {
             pgLoadingReview.setVisibility(View.INVISIBLE);
             if (reviews != null){
-                showReviews();
+                if (reviews.size() == NO_COMMENT) {
+                    showNoComments();
+                } else {
+                    showReviews();
+                }
                 reviewAdapter.setArrayListReview(reviews);
             }else{
                 showErrorMsg();
@@ -161,13 +167,21 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void showReviews() {
+        tvNoComments.setVisibility(View.INVISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
         tvErrorMsgReview.setVisibility(View.INVISIBLE);
     }
 
     private void showErrorMsg() {
+        tvNoComments.setVisibility(View.INVISIBLE);
         tvErrorMsgReview.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    private void showNoComments(){
+        recyclerView.setVisibility(View.INVISIBLE);
+        tvNoComments.setVisibility(View.VISIBLE);
+        tvErrorMsgReview.setVisibility(View.INVISIBLE);
     }
 
     @Override
