@@ -1,9 +1,12 @@
 package com.example.android.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,12 +19,14 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.Movies.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.Reviews.Review;
 import com.example.android.popularmovies.Reviews.ReviewParser;
 import com.example.android.popularmovies.ReviewsAdapter.ReviewAdapter;
+import com.example.android.popularmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
@@ -46,6 +51,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tvNoComments;
     private TextView tvErrorMsgReview;
     private ProgressBar pgLoadingReview;
+    private Button btnLike;
 
     private ArrayList<Review> reviewArrayList;
     private ReviewAdapter reviewAdapter;
@@ -70,6 +76,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvNoComments = (TextView) findViewById(R.id.tv_no_comments);
         tvErrorMsgReview = (TextView) findViewById(R.id.tv_error_msg_review);
         pgLoadingReview = (ProgressBar) findViewById(R.id.pg_loading_review);
+        btnLike = (Button) findViewById(R.id.btn_like_movie);
 
         reviewArrayList = new ArrayList<>();
         reviewAdapter = new ReviewAdapter();
@@ -94,6 +101,18 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         });
 
+        btnLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            int rowCount = getContentResolver().delete(
+                    MovieContract.MovieEntry.CONTENT_URI,
+                    MovieContract.MovieEntry.COLUMN_NAME_ID + "= ?",
+                    new String[]{Integer.toString(selectedMovie.getId())});
+            Log.d(TAG, Integer.toString(rowCount));
+            }
+        });
+
+        checkUserLikesTheMovie(selectedMovie.getId());
 
         if (savedInstanceState != null) {
             reviewArrayList = savedInstanceState.getParcelableArrayList(REVIEW_ARRAY_LIST_LABEL);
@@ -104,6 +123,29 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     }
 
+    private void checkUserLikesTheMovie(Integer id) {
+        Cursor cursor = getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                new String[] {MovieContract.MovieEntry._ID, MovieContract.MovieEntry.COLUMN_NAME_TITLE, MovieContract.MovieEntry.COLUMN_NAME_ID},
+                MovieContract.MovieEntry.COLUMN_NAME_ID + "= ?",
+                new String[]{Integer.toString(id)},
+                null
+        );
+        if (cursor.getCount()< 1) {
+            btnLike.setText("Like");
+        } else {
+            btnLike.setText("UnLike");
+        }
+    }
+
+    private void likeAMovie(Movie selectedMovie) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_TITLE, selectedMovie.getOriginalTitle());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_ID, selectedMovie.getId());
+        Uri resultUri = getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
+        Log.d(TAG, resultUri.toString());
+    }
+
     private void startAsyncTaskRetrieveReviews(Integer id) {
         if (isOnline()){
             new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(id));
@@ -111,7 +153,6 @@ public class MovieDetailActivity extends AppCompatActivity {
             showErrorMsg();
         }
     }
-
 
     private boolean isOnline() {
         ConnectivityManager cm =

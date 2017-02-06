@@ -106,11 +106,11 @@ public class MovieProvider extends ContentProvider {
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         switch (uriMatcher.match(uri)) {
-            case MOVIE_GET_ONE:
+            case MOVIE_GET_ALL:
                 int deleteResult = movieDBHelper.getWritableDatabase()
                         .delete(MovieContract.MovieEntry.TABLE_NAME,
                                 MovieContract.MovieEntry._ID + " = ?",
-                                new String[]{String.valueOf(ContentUris.parseId(uri))});
+                                new String[] {String.valueOf(ContentUris.parseId(uri))});
                 //TODO ask for reset _ID
                 return deleteResult;
             default:

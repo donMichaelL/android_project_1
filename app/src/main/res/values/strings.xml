@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="content_authority">com.example.android.popularmovies.app</string>
     <string name="error_msg">An Error Occurred.... Check your Internet Connection</string>
     <string name="rating">Rating</string>
     <string name="release_d">Release Date</string>
@@ -7,5 +8,4 @@
     <string name="download_app">Visit app store to download youTube app or a web browser</string>
     <string name="reviews">Reviews</string>
     <string name="no_comments">No reviews yet.</string>
-
 </resources>
