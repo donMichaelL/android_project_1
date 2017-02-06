@@ -77,6 +77,24 @@ public final class NetworkUtils {
         return  returnedUrl;
     }
 
+    public static URL buildUrlForReviewVideoMovieDB(int id){
+        String baseUrl = BASE_URL + Integer.toString(id) + "/reviews";
+        Uri buildUri = Uri.parse(baseUrl).buildUpon()
+                .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
+                .build();
+
+        Log.d(TAG, "The requested url:" + buildUri.toString());
+
+        URL returnedUrl = null;
+        try {
+            returnedUrl = new URL(buildUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return  returnedUrl;
+    }
+
+
     public static URL buildUrlForImages(String imageExtention){
         URL imageUrl = null;
         try {
@@ -99,6 +117,7 @@ public final class NetworkUtils {
 
         return buildUri;
     }
+
 
     public static String getResponseFromHttpUrl(URL url) throws IOException{
         Log.d(TAG, "Trying to connect and get Data from " + url.toString());

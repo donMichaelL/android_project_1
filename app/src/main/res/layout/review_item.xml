@@ -7,11 +7,13 @@
     <TextView
         android:id="@+id/tv_author"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimary"/>
 
     <TextView
         android:id="@+id/tv_comment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:padding="@dimen/activity_horizontal_margin" />
 
 </LinearLayout>

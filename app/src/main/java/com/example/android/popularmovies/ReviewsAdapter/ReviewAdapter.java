@@ -37,6 +37,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
 
     public void setArrayListReview(ArrayList<Review> arrayListReview) {
         this.arrayListReview = arrayListReview;
+        notifyDataSetChanged();
+
     }
 
     @Override
