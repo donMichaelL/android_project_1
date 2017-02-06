@@ -1,6 +1,9 @@
 package com.example.android.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -29,6 +32,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getName();
 
     public static final String MOVIE_ID = "movie_id";
+    private static final String REVIEW_ARRAY_LIST_LABEL ="review_array_list";
 
     private ImageView headerImage;
     private ImageView thumbnail;
@@ -88,10 +92,30 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         });
 
-        Log.d(TAG, "DetailActivity started with Movie " + selectedMovie.getVoteAverage());
 
-        // TODO checkConnectivity and Rotation check
-        new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(selectedMovie.getId()));
+        if (savedInstanceState != null) {
+            reviewArrayList = savedInstanceState.getParcelableArrayList(REVIEW_ARRAY_LIST_LABEL);
+            reviewAdapter.setArrayListReview(reviewArrayList);
+        } else {
+            startAsyncTaskRetrieveReviews(selectedMovie.getId());
+        }
+
+    }
+
+    private void startAsyncTaskRetrieveReviews(Integer id) {
+        if (isOnline()){
+            new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(id));
+        } else {
+            showErrorMsg();
+        }
+    }
+
+
+    private boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     private String returnRatingString(Integer voteAverage){
@@ -130,7 +154,6 @@ public class MovieDetailActivity extends AppCompatActivity {
             if (reviews != null){
                 showReviews();
                 reviewAdapter.setArrayListReview(reviews);
-                Log.d(TAG, "kjkjk ");
             }else{
                 showErrorMsg();
             }
@@ -147,5 +170,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         recyclerView.setVisibility(View.INVISIBLE);
     }
 
-
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(REVIEW_ARRAY_LIST_LABEL, reviewArrayList);
+        super.onSaveInstanceState(outState);
+    }
 }
