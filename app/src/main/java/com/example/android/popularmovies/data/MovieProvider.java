@@ -109,8 +109,8 @@ public class MovieProvider extends ContentProvider {
             case MOVIE_GET_ALL:
                 int deleteResult = movieDBHelper.getWritableDatabase()
                         .delete(MovieContract.MovieEntry.TABLE_NAME,
-                                MovieContract.MovieEntry._ID + " = ?",
-                                new String[] {String.valueOf(ContentUris.parseId(uri))});
+                                MovieContract.MovieEntry.COLUMN_NAME_ID + " = ?",
+                                new String[] {selectionArgs[0]});
                 //TODO ask for reset _ID
                 return deleteResult;
             default:

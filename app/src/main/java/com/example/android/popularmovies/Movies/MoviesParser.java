@@ -66,7 +66,7 @@ public final class MoviesParser {
         final String OWM_VIDEO = "video";
         final String OWM_VOTE_AVERAGE = "vote_average";
 
-        Movie movie =  new Movie(movieJsonObj.getInt(OWM_ID),
+        Movie movie =  new Movie(movieJsonObj.getString(OWM_ID),
                 movieJsonObj.getString(OWM_POSTER_PATH),
                 movieJsonObj.getString(OWM_BACKDROP_PATH),
                 movieJsonObj.getString(OWM_TITLE),

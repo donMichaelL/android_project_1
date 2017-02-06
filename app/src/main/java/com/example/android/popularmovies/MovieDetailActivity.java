@@ -106,8 +106,8 @@ public class MovieDetailActivity extends AppCompatActivity {
             public void onClick(View v) {
             int rowCount = getContentResolver().delete(
                     MovieContract.MovieEntry.CONTENT_URI,
-                    MovieContract.MovieEntry.COLUMN_NAME_ID + "= ?",
-                    new String[]{Integer.toString(selectedMovie.getId())});
+                    MovieContract.MovieEntry.COLUMN_NAME_ID + " = ?",
+                    new String[]{selectedMovie.getId()});
             Log.d(TAG, Integer.toString(rowCount));
             }
         });
@@ -123,17 +123,19 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     }
 
-    private void checkUserLikesTheMovie(Integer id) {
+    private void checkUserLikesTheMovie(String id) {
         Cursor cursor = getContentResolver().query(
                 MovieContract.MovieEntry.CONTENT_URI,
                 new String[] {MovieContract.MovieEntry._ID, MovieContract.MovieEntry.COLUMN_NAME_TITLE, MovieContract.MovieEntry.COLUMN_NAME_ID},
                 MovieContract.MovieEntry.COLUMN_NAME_ID + "= ?",
-                new String[]{Integer.toString(id)},
+                new String[]{id},
                 null
         );
         if (cursor.getCount()< 1) {
+            Log.d(TAG, "Like");
             btnLike.setText("Like");
         } else {
+            Log.d(TAG, "UnLike");
             btnLike.setText("UnLike");
         }
     }
@@ -146,7 +148,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         Log.d(TAG, resultUri.toString());
     }
 
-    private void startAsyncTaskRetrieveReviews(Integer id) {
+    private void startAsyncTaskRetrieveReviews(String id) {
         if (isOnline()){
             new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(id));
         } else {

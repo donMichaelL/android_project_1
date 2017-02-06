@@ -77,8 +77,8 @@ public final class NetworkUtils {
         return  returnedUrl;
     }
 
-    public static URL buildUrlForReviewVideoMovieDB(int id){
-        String baseUrl = BASE_URL + Integer.toString(id) + "/reviews";
+    public static URL buildUrlForReviewVideoMovieDB(String id){
+        String baseUrl = BASE_URL + id + "/reviews";
         Uri buildUri = Uri.parse(baseUrl).buildUpon()
                 .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
                 .build();

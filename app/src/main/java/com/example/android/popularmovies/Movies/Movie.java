@@ -10,7 +10,7 @@ import android.util.Log;
  */
 
 public class Movie implements Parcelable{
-    private Integer id;
+    private String id;
     private String posterPath;
     private String backdropPath;
     private String title;
@@ -25,7 +25,7 @@ public class Movie implements Parcelable{
     private String releaseDate;
     private int[] genresIds;
 
-    public Movie(Integer id, String posterPath, String backdropPath, String title,
+    public Movie(String id, String posterPath, String backdropPath, String title,
                  String originalTitle, String originalLanguage, Boolean adult,
                  String overview, Integer popularity, Integer voteCount,
                  Integer voteAverage, Boolean video, String releaseDate) {
@@ -45,7 +45,7 @@ public class Movie implements Parcelable{
     }
 
     protected Movie(Parcel in) {
-        id = in.readInt();
+        id = in.readString();
         posterPath = in.readString();
         backdropPath = in.readString();
         title = in.readString();
@@ -80,7 +80,7 @@ public class Movie implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeString(id);
         dest.writeString(posterPath);
         dest.writeString(backdropPath);
         dest.writeString(title);
@@ -104,11 +104,11 @@ public class Movie implements Parcelable{
         this.genresIds = genresIds;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 
