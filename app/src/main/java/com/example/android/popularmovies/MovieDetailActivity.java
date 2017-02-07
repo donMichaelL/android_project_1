@@ -37,6 +37,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     public static final String MOVIE_ID = "movie_id";
     private static final String REVIEW_ARRAY_LIST_LABEL ="review_array_list";
+    private static final String USER_LIKES_MOVIE = "user_likes_movie";
     private static final int NO_COMMENT = 0;
 
     private ImageView headerImage;
@@ -52,6 +53,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tvErrorMsgReview;
     private ProgressBar pgLoadingReview;
     private Button btnLike;
+    private boolean userLikesMovie;
 
     private ArrayList<Review> reviewArrayList;
     private ReviewAdapter reviewAdapter;
@@ -101,29 +103,45 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         });
 
+
         btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            int rowCount = getContentResolver().delete(
-                    MovieContract.MovieEntry.CONTENT_URI,
-                    MovieContract.MovieEntry.COLUMN_NAME_ID + " = ?",
-                    new String[]{selectedMovie.getId()});
-            Log.d(TAG, Integer.toString(rowCount));
+            boolean result;
+            if (userLikesMovie) {
+                result = unlikeAMovie(selectedMovie);
+            }else {
+                result = likeAMovie(selectedMovie);
+            }
+
+            if (result){
+                Toast.makeText(MovieDetailActivity.this, "Ok !", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(MovieDetailActivity.this, "Problem. Try Again", Toast.LENGTH_SHORT).show();
+            }
             }
         });
 
-        checkUserLikesTheMovie(selectedMovie.getId());
 
         if (savedInstanceState != null) {
             reviewArrayList = savedInstanceState.getParcelableArrayList(REVIEW_ARRAY_LIST_LABEL);
             reviewAdapter.setArrayListReview(reviewArrayList);
+            userLikesMovie = savedInstanceState.getBoolean(USER_LIKES_MOVIE);
         } else {
             startAsyncTaskRetrieveReviews(selectedMovie.getId());
+            userLikesMovie = checkUserLikesTheMovie(selectedMovie.getId());
+        }
+
+        if (userLikesMovie) {
+            btnLike.setText("Unlike");
+        }
+        else {
+            btnLike.setText("Like");
         }
 
     }
 
-    private void checkUserLikesTheMovie(String id) {
+    private boolean checkUserLikesTheMovie(String id) {
         Cursor cursor = getContentResolver().query(
                 MovieContract.MovieEntry.CONTENT_URI,
                 new String[] {MovieContract.MovieEntry._ID, MovieContract.MovieEntry.COLUMN_NAME_TITLE, MovieContract.MovieEntry.COLUMN_NAME_ID},
@@ -131,21 +149,30 @@ public class MovieDetailActivity extends AppCompatActivity {
                 new String[]{id},
                 null
         );
-        if (cursor.getCount()< 1) {
-            Log.d(TAG, "Like");
-            btnLike.setText("Like");
-        } else {
-            Log.d(TAG, "UnLike");
-            btnLike.setText("UnLike");
-        }
+        if (cursor.getCount() < 1) return false;
+        return true;
     }
 
-    private void likeAMovie(Movie selectedMovie) {
+    private boolean likeAMovie(Movie selectedMovie) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_TITLE, selectedMovie.getOriginalTitle());
         contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_ID, selectedMovie.getId());
         Uri resultUri = getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
-        Log.d(TAG, resultUri.toString());
+        if (resultUri == null) return false;
+        btnLike.setText("Unlike");
+        userLikesMovie = true;
+        return true;
+    }
+
+    private boolean unlikeAMovie(Movie selectedMovie){
+        int rowCount = getContentResolver().delete(
+                MovieContract.MovieEntry.CONTENT_URI,
+                MovieContract.MovieEntry.COLUMN_NAME_ID + " = ?",
+                new String[]{selectedMovie.getId()});
+        if (rowCount < 1) return false;
+        btnLike.setText("Like");
+        userLikesMovie = false;
+        return true;
     }
 
     private void startAsyncTaskRetrieveReviews(String id) {
@@ -230,6 +257,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList(REVIEW_ARRAY_LIST_LABEL, reviewArrayList);
+        outState.putBoolean(USER_LIKES_MOVIE, userLikesMovie);
         super.onSaveInstanceState(outState);
     }
 }
