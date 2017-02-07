@@ -36,7 +36,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     public void setMovieArrayList(ArrayList<Movie> movieArrayList) {
-        Log.d(TAG, "REFRESH");
         this.movieArrayList = movieArrayList;
         notifyDataSetChanged();
     }

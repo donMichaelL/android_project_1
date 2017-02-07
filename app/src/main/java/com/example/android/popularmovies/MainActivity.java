@@ -3,43 +3,39 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.Parcelable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.android.popularmovies.MovieAdapter.MovieAdapter;
 import com.example.android.popularmovies.Movies.Movie;
 import com.example.android.popularmovies.Movies.MoviesParser;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.data.MovieContract;
-import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener{
+public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String TAG = MainActivity.class.getName();
 
     public static String API_KEY ;
+    private static final int CURSOR_LOADER_ID = 0;
+
 
     public static final String MOVIE_TAG = "movieObj";
     private static final String MOVIE_ARRAY_LIST = "movie_list";
@@ -51,6 +47,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private RecyclerView movieRecyclerView;
     private TextView tvErrorMsg;
     private ProgressBar pgLoading;
+
+    private boolean showFavourite = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +71,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             movieArrayList = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST);
             movieAdapter.setMovieArrayList(movieArrayList);
         }
-
     }
 
     private void createAsyncTaskForMovieData(String orderingParam){
@@ -88,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
+
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
@@ -112,66 +110,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sort_by_popularity:
+                showFavourite = false;
                 movieAdapter.setMovieArrayList(null);
                 createAsyncTaskForMovieData(NetworkUtils.ORDERING_POPULARITY);
                 break;
             case R.id.sort_by_votes:
+                showFavourite = false;
                 movieAdapter.setMovieArrayList(null);
                 createAsyncTaskForMovieData(NetworkUtils.ORDERING_VOTES);
                 break;
             case R.id.sort_by_favourite:
                 movieAdapter.setMovieArrayList(null);
-                displayFavouriteMovies();
+                getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+                showFavourite = true;
                 break;
         }
         return true;
-    }
-
-    private void displayFavouriteMovies() {
-        String[] projection = {
-                MovieContract.MovieEntry._ID,
-                MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH,
-                MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH,
-                MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE,
-                MovieContract.MovieEntry.COLUMN_NAME_TITLE,
-                MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE,
-                MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW,
-                MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE,
-                MovieContract.MovieEntry.COLUMN_NAME_POPULARITY,
-                MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT,
-                MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE,
-                MovieContract.MovieEntry.COLUMN_NAME_ID
-        };
-
-        Cursor cursor = getContentResolver().query(
-                MovieContract.MovieEntry.CONTENT_URI,
-                projection,
-                null,
-                null,
-                null
-        );
-
-        if (cursor != null && cursor.getCount() > 0) {
-            movieArrayList = new ArrayList<>();
-            for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                Movie movie = new Movie(
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ID)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_TITLE)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POPULARITY)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE)),
-                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE))
-                        );
-                movieArrayList.add(movie);
-            }
-            Log.d(TAG, Integer.toString(movieArrayList.size()));
-            movieAdapter.setMovieArrayList(movieArrayList);
-        }
     }
 
     private void showErrorMsg(){
@@ -191,6 +145,78 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         intent.putExtra(MOVIE_TAG, clickedMovie);
         startActivity(intent);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // TODO check orientation
+        if (showFavourite) {
+            getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
+        }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        pgLoading.setVisibility(View.VISIBLE);
+
+        String[] projection = {
+                MovieContract.MovieEntry._ID,
+                MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH,
+                MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH,
+                MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE,
+                MovieContract.MovieEntry.COLUMN_NAME_TITLE,
+                MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE,
+                MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW,
+                MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE,
+                MovieContract.MovieEntry.COLUMN_NAME_POPULARITY,
+                MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT,
+                MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE,
+                MovieContract.MovieEntry.COLUMN_NAME_ID
+        };
+
+        return new CursorLoader(MainActivity.this, MovieContract.MovieEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Log.d(TAG, "Calling Loader");
+        if (cursor != null && cursor.getCount() > 0) {
+            movieArrayList = new ArrayList<>();
+            for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                Movie movie = new Movie(
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ID)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POPULARITY)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE))
+                );
+                movieArrayList.add(movie);
+            }
+            Log.d(TAG, Integer.toString(movieArrayList.size()));
+            movieAdapter.setMovieArrayList(movieArrayList);
+            pgLoading.setVisibility(View.INVISIBLE);
+            showMovieData();
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        movieAdapter.setMovieArrayList(null);
+
+    }
+
 
     private class MovieDBApiQueryTask extends AsyncTask<URL, Void, ArrayList<Movie>>{
 
