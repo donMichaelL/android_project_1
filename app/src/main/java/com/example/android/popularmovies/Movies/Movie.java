@@ -56,9 +56,9 @@ public class Movie implements Parcelable{
         voteCount = in.readString();
         voteAverage = in.readString();
         releaseDate = in.readString();
-        genresIds = in.createIntArray();
-        video = in.readByte() != 0;
-        adult = in.readByte() != 0;
+//        genresIds = in.createIntArray();
+//        video = in.readByte() != 0;
+//        adult = in.readByte() != 0;
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -72,6 +72,24 @@ public class Movie implements Parcelable{
             return new Movie[size];
         }
     };
+
+
+    public Movie(String id, String posterPath, String backdropPath, String title,
+                 String originalTitle, String originalLanguage,
+                 String overview, String popularity, String voteCount,
+                 String voteAverage, String releaseDate) {
+        this.id = id;
+        this.posterPath = posterPath;
+        this.backdropPath = backdropPath;
+        this.title = title;
+        this.originalTitle = originalTitle;
+        this.originalLanguage = originalLanguage;
+        this.overview = overview;
+        this.popularity = popularity;
+        this.voteCount = voteCount;
+        this.voteAverage = voteAverage;
+        this.releaseDate = releaseDate;
+    }
 
     @Override
     public int describeContents() {
@@ -91,9 +109,9 @@ public class Movie implements Parcelable{
         dest.writeString(voteCount);
         dest.writeString(voteAverage);
         dest.writeString(releaseDate);
-        dest.writeIntArray(genresIds);
-        dest.writeByte((byte) (video ? 1 : 0));
-        dest.writeByte((byte) (adult ? 1 : 0));
+//        dest.writeIntArray(genresIds);
+//        dest.writeByte((byte) (video ? 1 : 0));
+//        dest.writeByte((byte) (adult ? 1 : 0));
     }
 
     public int[] getGenresIds() {

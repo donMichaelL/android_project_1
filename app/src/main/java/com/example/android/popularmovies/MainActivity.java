@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.media.Image;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -27,6 +28,7 @@ import com.example.android.popularmovies.MovieAdapter.MovieAdapter;
 import com.example.android.popularmovies.Movies.Movie;
 import com.example.android.popularmovies.Movies.MoviesParser;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
+import com.example.android.popularmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -117,8 +119,59 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                 movieAdapter.setMovieArrayList(null);
                 createAsyncTaskForMovieData(NetworkUtils.ORDERING_VOTES);
                 break;
+            case R.id.sort_by_favourite:
+                movieAdapter.setMovieArrayList(null);
+                displayFavouriteMovies();
+                break;
         }
         return true;
+    }
+
+    private void displayFavouriteMovies() {
+        String[] projection = {
+                MovieContract.MovieEntry._ID,
+                MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH,
+                MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH,
+                MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE,
+                MovieContract.MovieEntry.COLUMN_NAME_TITLE,
+                MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE,
+                MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW,
+                MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE,
+                MovieContract.MovieEntry.COLUMN_NAME_POPULARITY,
+                MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT,
+                MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE,
+                MovieContract.MovieEntry.COLUMN_NAME_ID
+        };
+
+        Cursor cursor = getContentResolver().query(
+                MovieContract.MovieEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null
+        );
+
+        if (cursor != null && cursor.getCount() > 0) {
+            movieArrayList = new ArrayList<>();
+            for(cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+                Movie movie = new Movie(
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ID)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_POPULARITY)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE)),
+                        cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE))
+                        );
+                movieArrayList.add(movie);
+            }
+            Log.d(TAG, Integer.toString(movieArrayList.size()));
+            movieAdapter.setMovieArrayList(movieArrayList);
+        }
     }
 
     private void showErrorMsg(){

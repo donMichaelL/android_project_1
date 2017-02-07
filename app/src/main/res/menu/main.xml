@@ -4,13 +4,19 @@
     <item
         android:id="@+id/sort_by_popularity"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:title="POPULARITY"/>
 
     <item
         android:id="@+id/sort_by_votes"
         android:orderInCategory="1"
-        app:showAsAction="ifRoom"
+        app:showAsAction="never"
         android:title="VOTES"/>
+
+    <item
+        android:id="@+id/sort_by_favourite"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        android:title="@string/favourites"/>
 
 </menu>
