@@ -89,8 +89,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         originalTitle.setText(selectedMovie.getOriginalTitle());
         tvOverview.setText(selectedMovie.getOverview());
         tvReleaseDate.setText(selectedMovie.getReleaseDate());
-        ratingBar.setRating(returnRatingBase5(selectedMovie.getVoteAverage()));
-        tvRating.setText(returnRatingString(selectedMovie.getVoteAverage()));
+        ratingBar.setRating(returnRatingBase5(Float.parseFloat(selectedMovie.getVoteAverage())));
+        tvRating.setText(selectedMovie.getVoteAverage() + "/10");
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(reviewAdapter);
 
@@ -144,7 +144,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private boolean checkUserLikesTheMovie(String id) {
         Cursor cursor = getContentResolver().query(
                 MovieContract.MovieEntry.CONTENT_URI,
-                new String[] {MovieContract.MovieEntry._ID, MovieContract.MovieEntry.COLUMN_NAME_TITLE, MovieContract.MovieEntry.COLUMN_NAME_ID},
+                new String[] {MovieContract.MovieEntry._ID, MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE, MovieContract.MovieEntry.COLUMN_NAME_ID},
                 MovieContract.MovieEntry.COLUMN_NAME_ID + "= ?",
                 new String[]{id},
                 null
@@ -155,8 +155,17 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     private boolean likeAMovie(Movie selectedMovie) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_TITLE, selectedMovie.getOriginalTitle());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_TITLE, selectedMovie.getOriginalTitle());
         contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_ID, selectedMovie.getId());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_TITLE, selectedMovie.getTitle());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_POSTER_PATH, selectedMovie.getPosterPath());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_BACKDROP_PATH, selectedMovie.getBackdropPath());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_OVERVIEW, selectedMovie.getOverview());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_RELEASE_DATE, selectedMovie.getReleaseDate());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_ORIGINAL_LANGUAGE, selectedMovie.getOriginalLanguage());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_POPULARITY, selectedMovie.getPopularity());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_VOTE_COUNT, selectedMovie.getVoteCount());
+        contentValues.put(MovieContract.MovieEntry.COLUMN_NAME_VOTE_AVERAGE, selectedMovie.getVoteAverage());
         Uri resultUri = getContentResolver().insert(MovieContract.MovieEntry.CONTENT_URI, contentValues);
         if (resultUri == null) return false;
         btnLike.setText("Unlike");
@@ -190,12 +199,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
-    private String returnRatingString(Integer voteAverage){
-        return Integer.toString(voteAverage) + "/10";
-    }
 
-    private Float returnRatingBase5(Integer voteAverage){
-        return (float) voteAverage/2;
+    private Float returnRatingBase5(Float voteAverage){
+        return voteAverage/2;
     }
 
 

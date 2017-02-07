@@ -95,7 +95,8 @@ public class MovieProvider extends ContentProvider {
                     //TODO check this line
                     getContext().getContentResolver().notifyChange(uri, null);
                     return MovieContract.MovieEntry.buildFlavorsUri(newRowId);
-                }else {
+                }
+                else {
                     throw new android.database.SQLException("Failed to insert row into: " + uri);
                 }
             default:

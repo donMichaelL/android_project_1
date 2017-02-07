@@ -74,9 +74,9 @@ public final class MoviesParser {
                 movieJsonObj.getString(OWM_ORIGINAL_LANGUAGE),
                 movieJsonObj.getBoolean(OWM_ADULT),
                 movieJsonObj.getString(OWM_OVERVIEW),
-                movieJsonObj.getInt(OWM_POPULARITY),
-                movieJsonObj.getInt(OWM_VOTE_COUNT),
-                movieJsonObj.getInt(OWM_VOTE_AVERAGE),
+                movieJsonObj.getString(OWM_POPULARITY),
+                movieJsonObj.getString(OWM_VOTE_COUNT),
+                movieJsonObj.getString(OWM_VOTE_AVERAGE),
                 movieJsonObj.getBoolean(OWM_VIDEO),
                 movieJsonObj.getString(OWM_RELEASE_DATE)
                 );

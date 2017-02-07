@@ -18,17 +18,17 @@ public class Movie implements Parcelable{
     private String originalLanguage;
     private Boolean adult;
     private String overview;
-    private Integer popularity;
-    private Integer voteCount;
-    private Integer voteAverage;
+    private String popularity;
+    private String voteCount;
+    private String voteAverage;
     private Boolean video;
     private String releaseDate;
     private int[] genresIds;
 
     public Movie(String id, String posterPath, String backdropPath, String title,
                  String originalTitle, String originalLanguage, Boolean adult,
-                 String overview, Integer popularity, Integer voteCount,
-                 Integer voteAverage, Boolean video, String releaseDate) {
+                 String overview, String popularity, String voteCount,
+                 String voteAverage, Boolean video, String releaseDate) {
         this.id = id;
         this.posterPath = posterPath;
         this.backdropPath = backdropPath;
@@ -52,9 +52,9 @@ public class Movie implements Parcelable{
         originalTitle = in.readString();
         originalLanguage = in.readString();
         overview = in.readString();
-        popularity = in.readInt();
-        voteCount = in.readInt();
-        voteAverage = in.readInt();
+        popularity = in.readString();
+        voteCount = in.readString();
+        voteAverage = in.readString();
         releaseDate = in.readString();
         genresIds = in.createIntArray();
         video = in.readByte() != 0;
@@ -87,9 +87,9 @@ public class Movie implements Parcelable{
         dest.writeString(originalTitle);
         dest.writeString(originalLanguage);
         dest.writeString(overview);
-        dest.writeInt(popularity);
-        dest.writeInt(voteCount);
-        dest.writeInt(voteAverage);
+        dest.writeString(popularity);
+        dest.writeString(voteCount);
+        dest.writeString(voteAverage);
         dest.writeString(releaseDate);
         dest.writeIntArray(genresIds);
         dest.writeByte((byte) (video ? 1 : 0));
@@ -168,27 +168,27 @@ public class Movie implements Parcelable{
         this.overview = overview;
     }
 
-    public Integer getPopularity() {
+    public String getPopularity() {
         return popularity;
     }
 
-    public void setPopularity(Integer popularity) {
+    public void setPopularity(String popularity) {
         this.popularity = popularity;
     }
 
-    public Integer getVoteCount() {
+    public String getVoteCount() {
         return voteCount;
     }
 
-    public void setVoteCount(Integer voteCount) {
+    public void setVoteCount(String voteCount) {
         this.voteCount = voteCount;
     }
 
-    public Integer getVoteAverage() {
+    public String getVoteAverage() {
         return voteAverage;
     }
 
-    public void setVoteAverage(Integer voteAverage) {
+    public void setVoteAverage(String voteAverage) {
         this.voteAverage = voteAverage;
     }
 
