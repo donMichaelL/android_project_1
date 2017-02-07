@@ -46,7 +46,7 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
         if (intent == null){
             finish();
         }
-        Integer id = getIntent().getIntExtra(MovieDetailActivity.MOVIE_ID, 0);
+        String id = getIntent().getStringExtra(MovieDetailActivity.MOVIE_ID);
 
         videoRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_video);
         tvErrorMsg = (TextView) findViewById(R.id.tv_error_msg_video);
@@ -66,7 +66,7 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
         }
     }
 
-    private void createAnyncTasForVideoMovieData(Integer id) {
+    private void createAnyncTasForVideoMovieData(String id) {
         if (isOnline()){
             URL requestUrl = NetworkUtils.buildUrlForMovieVideoMovieDB(id);
             new MovieDBVideoQueryTask().execute(requestUrl);
