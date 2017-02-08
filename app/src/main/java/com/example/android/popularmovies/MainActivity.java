@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.d(TAG, "Calling Loader");
+        pgLoading.setVisibility(View.INVISIBLE);
         if (cursor != null && cursor.getCount() > 0) {
             movieArrayList = new ArrayList<>();
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -206,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             }
             Log.d(TAG, Integer.toString(movieArrayList.size()));
             movieAdapter.setMovieArrayList(movieArrayList);
-            pgLoading.setVisibility(View.INVISIBLE);
             showMovieData();
         }
     }
