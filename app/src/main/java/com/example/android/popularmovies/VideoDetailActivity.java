@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.popularmovies.MovieAdapter.MovieAdapter;
+import com.example.android.popularmovies.Movies.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.Video.Video;
 import com.example.android.popularmovies.Video.VideoParser;
@@ -43,7 +44,7 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_detail);
         Intent intent = getIntent();
-        if (intent == null){
+        if (intent == null || !intent.hasExtra(MovieDetailActivity.MOVIE_ID)){
             finish();
         }
         String id = getIntent().getStringExtra(MovieDetailActivity.MOVIE_ID);

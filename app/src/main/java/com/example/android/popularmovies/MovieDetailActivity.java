@@ -63,8 +63,14 @@ public class MovieDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
         Intent intent = getIntent();
+
+        if (intent == null  || !intent.hasExtra(MainActivity.MOVIE_TAG)) {
+            finish();
+        }
+
         final Movie selectedMovie = intent.getParcelableExtra(MainActivity.MOVIE_TAG);
         Log.d(TAG, "DetailActivity started with Movie " + selectedMovie.getId());
+
 
         headerImage = (ImageView) findViewById(R.id.header_image);
         thumbnail = (ImageView) findViewById(R.id.thumbnail);
