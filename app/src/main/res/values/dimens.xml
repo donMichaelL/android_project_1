@@ -3,4 +3,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="header_image_height">150dp</dimen>
+    <dimen name="thumbnail_large_screen_width">200dp</dimen>
+    <dimen name="thumbnail_large_screen_height">300dp</dimen>
 </resources>
