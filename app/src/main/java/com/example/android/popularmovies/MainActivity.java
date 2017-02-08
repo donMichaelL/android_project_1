@@ -208,6 +208,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             Log.d(TAG, Integer.toString(movieArrayList.size()));
             movieAdapter.setMovieArrayList(movieArrayList);
             showMovieData();
+        } else {
+            movieAdapter.setMovieArrayList(null);
         }
     }
 
