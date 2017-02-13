@@ -17,6 +17,24 @@ import java.util.ArrayList;
 public final class MoviesParser {
     private final static String TAG = MoviesParser.class.getName();
 
+    public static int getTotalPages(String moviesJsonStr) throws JSONException {
+        Log.d(TAG, "Starting Parsing Data");
+        final String OWM_SUCCESS = "success";
+        final String OWM_TOTAL_PAGES = "total_pages";
+
+        JSONObject moviesJson = new JSONObject(moviesJsonStr);
+
+        /* Is there an error? p.x. api */
+        if(moviesJson.has(OWM_SUCCESS)){
+            boolean result = moviesJson.getBoolean(OWM_SUCCESS);
+            if(!result){
+                return 0;
+            }
+        }
+
+        return moviesJson.getInt(OWM_TOTAL_PAGES);
+    }
+
 
     public static ArrayList<Movie> getSimpleStringFromJson(String moviesJsonStr) throws JSONException {
         Log.d(TAG, "Starting Parsing Data");
@@ -93,15 +111,4 @@ public final class MoviesParser {
         return genresIds;
     }
 
-//    private static Date returnDateFromString(String dateStr){
-//        /* Date Format 2009-03-07 */
-//        DateFormat df = new SimpleDateFormat("yyyy-mm-dd");
-//        Date date = null;
-//        try {
-//            date = df.parse(dateStr);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        return date;
-//    }
 }

@@ -25,18 +25,27 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     private ArrayList<Movie> movieArrayList;
     private Context context;
     private final ListItemClickListener mOnClickListener;
+    private final OnLoadMoreListener mOnLoadMoreListener;
+    boolean isLoading = false, isMoreDataAvailable = true;
 
-    public MovieAdapter(Context context, ListItemClickListener mOnClickListener) {
+
+    public MovieAdapter(Context context, ListItemClickListener mOnClickListener, OnLoadMoreListener mOnLoadMoreListener) {
         this.context = context;
         this.mOnClickListener = mOnClickListener;
+        this.mOnLoadMoreListener = mOnLoadMoreListener;
     }
 
     public interface ListItemClickListener{
         void onListItemClick(int clickedItemIndex);
     }
 
-    public void setMovieArrayList(ArrayList<Movie> movieArrayList) {
+    public interface OnLoadMoreListener{
+        void onLoadMore();
+    }
+
+    public void setMovieArrayList(ArrayList<Movie> movieArrayList, boolean notLoadMore) {
         this.movieArrayList = movieArrayList;
+        isLoading = notLoadMore;
         notifyDataSetChanged();
     }
 
@@ -50,9 +59,14 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
-        Movie bindMovie = movieArrayList.get(position);
-        Log.d(TAG, "bindMovie.getPosterPath()");
-        Picasso.with(context).load(NetworkUtils.buildUrlForImages(bindMovie.getPosterPath()).toString()).into(holder.imageViewPoster);
+        if (position >= getItemCount() - 1 && isMoreDataAvailable && !isLoading && mOnLoadMoreListener != null) {
+            isLoading = true;
+            mOnLoadMoreListener.onLoadMore();
+        } else {
+
+            Movie bindMovie = movieArrayList.get(position);
+            Picasso.with(context).load(NetworkUtils.buildUrlForImages(bindMovie.getPosterPath()).toString()).into(holder.imageViewPoster);
+        }
     }
 
     @Override

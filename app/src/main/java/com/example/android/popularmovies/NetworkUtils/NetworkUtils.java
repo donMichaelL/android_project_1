@@ -21,13 +21,12 @@ public final class NetworkUtils {
 
     private final static String TAG = NetworkUtils.class.getName();
 
-//    private final static String API_KEY = "API_KEY";
-
     private final static String BASE_URL = "https://api.themoviedb.org/3/movie/";
     private final static String IMAGE_URL = "http://image.tmdb.org/t/p/w185//";
 
 
     private final static String API_PARAM = "api_key";
+    private final static String PAGE_PARAM = "page";
 
     public final static String ORDERING_POPULARITY = "popularity";
     public final static String ORDERING_VOTES = "vote_average";
@@ -37,7 +36,7 @@ public final class NetworkUtils {
 
 
 
-    public static URL buildUrlForQueryOrderingMovieDB(String orderingParam) {
+    public static URL buildUrlForQueryOrderingMovieDB(String orderingParam, int pageNumber) {
         String baseUrl;
         if( orderingParam == ORDERING_POPULARITY){
             baseUrl = BASE_URL.concat("popular");
@@ -46,6 +45,7 @@ public final class NetworkUtils {
         }
         Uri buildUri = Uri.parse(baseUrl).buildUpon()
                 .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
+                .appendQueryParameter(PAGE_PARAM, Integer.toString(pageNumber))
                 .build();
 
         Log.d(TAG, "The requested url: " + buildUri.toString());
