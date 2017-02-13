@@ -128,7 +128,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void makeOrderingQueryInMovieDb(String orderingParam){
-        /*  TODO Take Care of current Page */
         URL requestURL = NetworkUtils.buildUrlForQueryOrderingMovieDB(orderingParam, currentPage);
         new MovieDBApiQueryTask().execute(requestURL);
     }
@@ -196,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public void onResume() {
         super.onResume();
-        // TODO check orientation
         if (choice == FAVOURITE_CHOICE) {
             getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
         }
