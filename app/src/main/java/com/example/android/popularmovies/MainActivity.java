@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -44,11 +45,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private ArrayList<Movie> movieArrayList;
     private MovieAdapter movieAdapter;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView movieRecyclerView;
     private TextView tvErrorMsg;
     private ProgressBar pgLoading;
 
-    private boolean showFavourite = false;
+    private static final String FAVOURITE_CHOICE = "favorite";
+    private String choice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         movieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movie);
         tvErrorMsg = (TextView) findViewById(R.id.tv_error_msg);
         pgLoading = (ProgressBar) findViewById(R.id.pg_loading);
@@ -65,8 +69,24 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         movieAdapter = new MovieAdapter(this, this);
         movieRecyclerView.setAdapter(movieAdapter);
 
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                if (choice == FAVOURITE_CHOICE) {
+                    movieAdapter.setMovieArrayList(null);
+                    getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, MainActivity.this);
+                }else {
+                    movieAdapter.setMovieArrayList(null);
+                    createAsyncTaskForMovieData(choice);
+                }
+
+            }
+        });
+
         if(savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_ARRAY_LIST)){
-            createAsyncTaskForMovieData(NetworkUtils.ORDERING_POPULARITY);
+            choice = NetworkUtils.ORDERING_POPULARITY;
+            createAsyncTaskForMovieData(choice);
         } else {
             movieArrayList = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST);
             movieAdapter.setMovieArrayList(movieArrayList);
@@ -110,19 +130,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.sort_by_popularity:
-                showFavourite = false;
                 movieAdapter.setMovieArrayList(null);
-                createAsyncTaskForMovieData(NetworkUtils.ORDERING_POPULARITY);
+                choice = NetworkUtils.ORDERING_POPULARITY;
+                createAsyncTaskForMovieData(choice);
                 break;
             case R.id.sort_by_votes:
-                showFavourite = false;
                 movieAdapter.setMovieArrayList(null);
-                createAsyncTaskForMovieData(NetworkUtils.ORDERING_VOTES);
+                choice = NetworkUtils.ORDERING_VOTES;
+                createAsyncTaskForMovieData(choice);
                 break;
             case R.id.sort_by_favourite:
                 movieAdapter.setMovieArrayList(null);
+                choice = FAVOURITE_CHOICE;
                 getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
-                showFavourite = true;
                 break;
         }
         return true;
@@ -150,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public void onResume() {
         super.onResume();
         // TODO check orientation
-        if (showFavourite) {
+        if (choice == FAVOURITE_CHOICE) {
             getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
         }
     }
@@ -187,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         Log.d(TAG, "Calling Loader");
         pgLoading.setVisibility(View.INVISIBLE);
+        swipeRefreshLayout.setRefreshing(false);
         if (cursor != null && cursor.getCount() > 0) {
             movieArrayList = new ArrayList<>();
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -244,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         @Override
         protected void onPostExecute(ArrayList<Movie> movieArrayList) {
             pgLoading.setVisibility(View.INVISIBLE);
+            swipeRefreshLayout.setRefreshing(false);
             if(movieArrayList != null ) {
                 Log.d(TAG, "Data received with success");
                 showMovieData();
