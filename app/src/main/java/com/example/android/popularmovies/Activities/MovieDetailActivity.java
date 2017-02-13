@@ -1,4 +1,4 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.Activities;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -21,11 +21,12 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.popularmovies.Movies.Movie;
+import com.example.android.popularmovies.Pojo.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
-import com.example.android.popularmovies.Reviews.Review;
-import com.example.android.popularmovies.Reviews.ReviewParser;
-import com.example.android.popularmovies.ReviewsAdapter.ReviewAdapter;
+import com.example.android.popularmovies.Pojo.Review;
+import com.example.android.popularmovies.Parsers.ReviewParser;
+import com.example.android.popularmovies.Adapters.ReviewAdapter;
+import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
 

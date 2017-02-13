@@ -1,9 +1,8 @@
-package com.example.android.popularmovies.Movies;
+package com.example.android.popularmovies.Pojo;
 
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 /**
  * Created by Michalis on 1/27/2017.

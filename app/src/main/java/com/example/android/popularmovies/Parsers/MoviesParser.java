@@ -1,17 +1,14 @@
-package com.example.android.popularmovies.Movies;
+package com.example.android.popularmovies.Parsers;
 
 import android.util.Log;
+
+import com.example.android.popularmovies.Pojo.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by Michalis on 1/27/2017.

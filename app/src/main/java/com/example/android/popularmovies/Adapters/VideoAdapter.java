@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.VideoAdapter;
+package com.example.android.popularmovies.Adapters;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.R;
-import com.example.android.popularmovies.Video.Video;
+import com.example.android.popularmovies.Pojo.Video;
 
 import java.util.ArrayList;
 

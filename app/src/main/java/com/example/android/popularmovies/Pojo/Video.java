@@ -1,4 +1,4 @@
-package com.example.android.popularmovies.Video;
+package com.example.android.popularmovies.Pojo;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.Activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,12 +16,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.popularmovies.MovieAdapter.MovieAdapter;
-import com.example.android.popularmovies.Movies.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
-import com.example.android.popularmovies.Video.Video;
-import com.example.android.popularmovies.Video.VideoParser;
-import com.example.android.popularmovies.VideoAdapter.VideoAdapter;
+import com.example.android.popularmovies.Pojo.Video;
+import com.example.android.popularmovies.Parsers.VideoParser;
+import com.example.android.popularmovies.Adapters.VideoAdapter;
+import com.example.android.popularmovies.R;
 
 import java.net.URL;
 import java.util.ArrayList;

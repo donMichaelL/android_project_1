@@ -3,9 +3,8 @@ package com.example.android.popularmovies.NetworkUtils;
 
 import android.net.Uri;
 import android.util.Log;
-import android.widget.ProgressBar;
 
-import com.example.android.popularmovies.MainActivity;
+import com.example.android.popularmovies.Activities.MainActivity;
 
 import java.io.IOException;
 import java.io.InputStream;
