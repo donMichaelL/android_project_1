@@ -1,10 +1,7 @@
 package com.example.android.popularmovies.Activities;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -77,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                if (choice == FAVOURITE_CHOICE) {
+                if (choice.equals(FAVOURITE_CHOICE)) {
                     movieAdapter.setMovieArrayList(null, true);
                     getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, MainActivity.this);
                 }else {
@@ -96,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         } else {
             movieArrayList = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST);
             choice = savedInstanceState.getString(CHOICE);
-            if (choice == FAVOURITE_CHOICE)
+            if (choice.equals(FAVOURITE_CHOICE))
                 movieAdapter.setMovieArrayList(movieArrayList, true);
             else
                 movieAdapter.setMovieArrayList(movieArrayList, false);
@@ -187,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public void onResume() {
         super.onResume();
-        if (choice == FAVOURITE_CHOICE) {
+        if (choice.equals(FAVOURITE_CHOICE)) {
             getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
         }
     }

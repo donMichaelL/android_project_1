@@ -41,7 +41,7 @@ public final class NetworkUtils {
 
     public static URL buildUrlForQueryOrderingMovieDB(String orderingParam, int pageNumber) {
         String baseUrl;
-        if( orderingParam == ORDERING_POPULARITY){
+        if( orderingParam.equals(ORDERING_POPULARITY)){
             baseUrl = BASE_URL.concat("popular");
         }else {
             baseUrl = BASE_URL.concat("top_rated");
@@ -113,11 +113,9 @@ public final class NetworkUtils {
             return null;
         }
 
-        Uri buildUri = Uri.parse(YOUTUBE).buildUpon()
+        return Uri.parse(YOUTUBE).buildUpon()
                 .appendQueryParameter(YOUTUBE_WATCH, key)
                 .build();
-
-        return buildUri;
     }
 
     public static boolean isOnline(Context context){

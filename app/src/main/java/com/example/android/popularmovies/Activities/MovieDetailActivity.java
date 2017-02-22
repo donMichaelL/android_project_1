@@ -1,11 +1,8 @@
 package com.example.android.popularmovies.Activities;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -157,6 +154,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 null
         );
         if (cursor.getCount() < 1) return false;
+        cursor.close();
         return true;
     }
 

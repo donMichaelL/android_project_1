@@ -32,7 +32,7 @@
             android:parentActivityName=".Activities.MovieDetailActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.VideoDetailActivity"></meta-data>
+                android:value=".Activities.VideoDetailActivity" />
         </activity>
         <provider
             android:authorities="@string/content_authority"
