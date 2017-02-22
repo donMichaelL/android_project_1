@@ -104,20 +104,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     private void createAsyncTaskForMovieData(String orderingParam){
-        if(isOnline()){
+        if(NetworkUtils.isOnline(this)){
             makeOrderingQueryInMovieDb(orderingParam);
         } else{
             showErrorMsg();
         }
     }
 
-    private boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

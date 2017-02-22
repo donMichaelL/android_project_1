@@ -67,7 +67,7 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
     }
 
     private void createAnyncTasForVideoMovieData(String id) {
-        if (isOnline()){
+        if (NetworkUtils.isOnline(this)){
             URL requestUrl = NetworkUtils.buildUrlForMovieVideoMovieDB(id);
             new MovieDBVideoQueryTask().execute(requestUrl);
         }else {
@@ -83,13 +83,6 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
     private void showVideoData(){
         videoRecyclerView.setVisibility(View.VISIBLE);
         tvErrorMsg.setVisibility(View.INVISIBLE);
-    }
-
-    private boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     @Override

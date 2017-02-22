@@ -192,25 +192,16 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     private void startAsyncTaskRetrieveReviews(String id) {
-        if (isOnline()){
+        if (NetworkUtils.isOnline(this)){
             new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(id));
         } else {
             showErrorMsg();
         }
     }
 
-    private boolean isOnline() {
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netInfo = cm.getActiveNetworkInfo();
-        return netInfo != null && netInfo.isConnectedOrConnecting();
-    }
-
-
     private Float returnRatingBase5(Float voteAverage){
         return voteAverage/2;
     }
-
 
     private class MovieDBReviewQueryTask extends AsyncTask<URL, Void, ArrayList<Review>>{
         @Override
