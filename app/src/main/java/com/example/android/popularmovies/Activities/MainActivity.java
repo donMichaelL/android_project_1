@@ -22,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.Adapters.MovieAdapter;
+import com.example.android.popularmovies.BuildConfig;
 import com.example.android.popularmovies.Pojo.Movie;
 import com.example.android.popularmovies.Parsers.MoviesParser;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        API_KEY = getResources().getString(R.string.secret_api);
+        API_KEY = BuildConfig.TMDB_API_KEY;
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
