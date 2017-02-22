@@ -1,7 +1,11 @@
 package com.example.android.popularmovies.Activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -54,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private static final String FAVOURITE_CHOICE = "favorite";
     private String choice;
 
+    private BroadcastReceiver internetChangeReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         API_KEY = BuildConfig.TMDB_API_KEY;
@@ -69,7 +75,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         movieRecyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), getResources().getInteger(R.integer.movies_per_row), GridLayoutManager.VERTICAL, false));
         movieAdapter = new MovieAdapter(this, this, this);
         movieRecyclerView.setAdapter(movieAdapter);
-
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -98,6 +103,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             else
                 movieAdapter.setMovieArrayList(movieArrayList, false);
         }
+
+        internetChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (!choice.equals(FAVOURITE_CHOICE) && NetworkUtils.isOnline(context)) {
+                    makeOrderingQueryInMovieDb(choice);
+                }
+            }
+        };
     }
 
     private void createAsyncTaskForMovieData(String orderingParam){
@@ -108,6 +122,22 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (internetChangeReceiver != null) {
+            IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            this.registerReceiver(internetChangeReceiver, intentFilter);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (internetChangeReceiver != null) {
+            this.unregisterReceiver(internetChangeReceiver);
+        }
+    }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -158,6 +188,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private void showErrorMsg(){
         movieRecyclerView.setVisibility(View.INVISIBLE);
         tvErrorMsg.setVisibility(View.VISIBLE);
+        pgLoading.setVisibility(View.INVISIBLE);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private void showMovieData(){
@@ -255,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
 
 
-    private class MovieDBApiQueryTask extends AsyncTask<URL, Void, ArrayList<Movie>>{
+    public class MovieDBApiQueryTask extends AsyncTask<URL, Void, ArrayList<Movie>>{
 
         @Override
         protected void onPreExecute() {
