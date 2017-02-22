@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private static final String MOVIE_ARRAY_LIST = "movie_list";
     private static final String CHOICE = "choice";
 
-
-    private static final int NUM_COLS = 4;
     private ArrayList<Movie> movieArrayList;
     private int totalPages;
     private int currentPage = 1;
@@ -71,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         tvErrorMsg = (TextView) findViewById(R.id.tv_error_msg);
         pgLoading = (ProgressBar) findViewById(R.id.pg_loading);
 
-        movieRecyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), NUM_COLS, GridLayoutManager.VERTICAL, false));
+        movieRecyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), getResources().getInteger(R.integer.movies_per_row), GridLayoutManager.VERTICAL, false));
         movieAdapter = new MovieAdapter(this, this, this);
         movieRecyclerView.setAdapter(movieAdapter);
 
