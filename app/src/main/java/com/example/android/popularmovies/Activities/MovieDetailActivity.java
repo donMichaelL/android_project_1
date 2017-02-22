@@ -1,8 +1,12 @@
 package com.example.android.popularmovies.Activities;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +60,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     private ArrayList<Review> reviewArrayList;
     private ReviewAdapter reviewAdapter;
 
+    private BroadcastReceiver internetChangeReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +74,6 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         final Movie selectedMovie = intent.getParcelableExtra(MainActivity.MOVIE_TAG);
         Log.d(TAG, "DetailActivity started with Movie " + selectedMovie.getId());
-
 
         headerImage = (ImageView) findViewById(R.id.header_image);
         thumbnail = (ImageView) findViewById(R.id.thumbnail);
@@ -142,7 +147,31 @@ public class MovieDetailActivity extends AppCompatActivity {
         else {
             btnLike.setText("Like");
         }
+        internetChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (NetworkUtils.isOnline(context)){
+                    new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(selectedMovie.getId()));
+                }
+            }
+        };
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (internetChangeReceiver != null) {
+            IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            this.registerReceiver(internetChangeReceiver, intentFilter);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (internetChangeReceiver != null) {
+            this.unregisterReceiver(internetChangeReceiver);
+        }
     }
 
     private boolean checkUserLikesTheMovie(String id) {

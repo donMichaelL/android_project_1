@@ -1,6 +1,10 @@
 package com.example.android.popularmovies.Activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +38,7 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
     private TextView tvErrorMsg;
     private ProgressBar pgLoading;
 
+    private BroadcastReceiver internetChangeReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +48,7 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
         if (intent == null || !intent.hasExtra(MovieDetailActivity.MOVIE_ID)){
             finish();
         }
-        String id = getIntent().getStringExtra(MovieDetailActivity.MOVIE_ID);
+        final String id = getIntent().getStringExtra(MovieDetailActivity.MOVIE_ID);
 
         videoRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_video);
         tvErrorMsg = (TextView) findViewById(R.id.tv_error_msg_video);
@@ -60,6 +65,31 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
         } else {
             videoArrayList = savedInstanceState.getParcelableArrayList(VIDEO_ARRAY_LIST);
             videoAdapter.setArrayAdapter(videoArrayList);
+        }
+
+        internetChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (NetworkUtils.isOnline(context)){
+                    createAnyncTasForVideoMovieData(id);                }
+            }
+        };
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (internetChangeReceiver != null) {
+            this.unregisterReceiver(internetChangeReceiver);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (internetChangeReceiver != null) {
+            IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            this.registerReceiver(internetChangeReceiver, intentFilter);
         }
     }
 
