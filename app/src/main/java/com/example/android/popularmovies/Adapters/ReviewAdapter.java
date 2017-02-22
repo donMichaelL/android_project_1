@@ -19,8 +19,6 @@ import java.util.ArrayList;
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder> {
     ArrayList<Review> arrayListReview;
 
-
-
     @Override
     public ReviewAdapter.ReviewAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -45,6 +43,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
     public int getItemCount() {
         if (arrayListReview == null) return 0;
         return arrayListReview.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        Review review = arrayListReview.get(position);
+        return Long.parseLong(review.getId());
     }
 
     public class ReviewAdapterViewHolder extends RecyclerView.ViewHolder{

@@ -49,6 +49,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     @Override
+    public long getItemId(int position) {
+        Movie movie = movieArrayList.get(position);
+        return Long.parseLong(movie.getId());
+    }
+
+    @Override
     public MovieAdapterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);

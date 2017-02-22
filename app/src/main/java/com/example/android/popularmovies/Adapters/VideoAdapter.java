@@ -51,6 +51,12 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoAdapter
         return videoArrayList.size();
     }
 
+    @Override
+    public long getItemId(int position) {
+        Video video = videoArrayList.get(position);
+        return Long.parseLong(video.getId());
+    }
+
     public class VideoAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView tvTitle;
 
