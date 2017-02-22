@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.R;
-import com.example.android.popularmovies.Pojo.Review;
+import com.example.android.popularmovies.models.Review;
 
 import java.util.ArrayList;
 

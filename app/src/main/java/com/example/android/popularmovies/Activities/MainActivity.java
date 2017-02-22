@@ -24,7 +24,7 @@ import android.widget.TextView;
 
 import com.example.android.popularmovies.Adapters.MovieAdapter;
 import com.example.android.popularmovies.BuildConfig;
-import com.example.android.popularmovies.Pojo.Movie;
+import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.Parsers.MoviesParser;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.R;
@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private static final String TAG = MainActivity.class.getName();
 
-    public static String API_KEY ;
+    public static String API_KEY = BuildConfig.TMDB_API_KEY; ;
     private static final int CURSOR_LOADER_ID = 0;
 
 
@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        API_KEY = BuildConfig.TMDB_API_KEY;
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 

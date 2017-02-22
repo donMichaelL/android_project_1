@@ -62,23 +62,6 @@ public final class NetworkUtils {
         return returnedUrl;
     }
 
-    public static URL buildUrlForMovieVideoMovieDB(String id){
-        String baseUrl = BASE_URL + id + "/videos";
-        Uri buildUri = Uri.parse(baseUrl).buildUpon()
-                .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
-                .build();
-
-        Log.d(TAG, "The requested url:" + buildUri.toString());
-
-        URL returnedUrl = null;
-        try {
-            returnedUrl = new URL(buildUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return  returnedUrl;
-    }
-
     public static URL buildUrlForReviewVideoMovieDB(String id){
         String baseUrl = BASE_URL + id + "/reviews";
         Uri buildUri = Uri.parse(baseUrl).buildUpon()

@@ -18,13 +18,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
-import com.example.android.popularmovies.Pojo.Video;
+import com.example.android.popularmovies.api.ApiClient;
+import com.example.android.popularmovies.api.ApiInterface;
+import com.example.android.popularmovies.models.Video;
 import com.example.android.popularmovies.Parsers.VideoParser;
 import com.example.android.popularmovies.Adapters.VideoAdapter;
 import com.example.android.popularmovies.R;
+import com.example.android.popularmovies.models.VideoResponse;
 
 import java.net.URL;
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class VideoDetailActivity extends AppCompatActivity implements VideoAdapter.ListItemClickListener {
     private static final String TAG = VideoDetailActivity.class.getName();
@@ -95,9 +102,31 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
 
     private void createAnyncTasForVideoMovieData(String id) {
         if (NetworkUtils.isOnline(this)){
-            URL requestUrl = NetworkUtils.buildUrlForMovieVideoMovieDB(id);
-            new MovieDBVideoQueryTask().execute(requestUrl);
+            ApiInterface apiInterface = ApiClient.retrofitVideoBuilder().create(ApiInterface.class);
+            Call<VideoResponse> call = apiInterface.getVideoFromId(id, MainActivity.API_KEY);
+            Log.d(TAG, call.request().url().toString());
+            pgLoading.setVisibility(View.VISIBLE);
+            call.enqueue(new Callback<VideoResponse>() {
+                @Override
+                public void onResponse(Call<VideoResponse> call, Response<VideoResponse> response) {
+                    pgLoading.setVisibility(View.INVISIBLE);
+                    if (response.isSuccessful()) {
+                        videoArrayList = response.body().getResults();
+                        videoAdapter.setArrayAdapter(videoArrayList);
+                        showVideoData();
+                    } else {
+                        showErrorMsg();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<VideoResponse> call, Throwable t) {
+                    showErrorMsg();
+                }
+            });
+
         }else {
+            pgLoading.setVisibility(View.INVISIBLE);
             showErrorMsg();
         }
     }
@@ -127,35 +156,6 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
             }
         } else {
             Toast.makeText(this, R.string.only_videos_youtube, Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private class MovieDBVideoQueryTask extends AsyncTask<URL, Void, ArrayList<Video>>{
-
-        @Override
-        protected ArrayList<Video> doInBackground(URL... params) {
-            Log.d(TAG, "Asynchronous Task is stating retrieving data");
-            URL requestUrl = params[0];
-            try {
-                String responseString = NetworkUtils.getResponseFromHttpUrl(requestUrl);
-                videoArrayList = VideoParser.createVideoArrayFromStringJson(responseString);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-            return videoArrayList;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Video> videoArrayList) {
-            pgLoading.setVisibility(View.INVISIBLE);
-            if (videoArrayList != null){
-                Log.d(TAG, "Data received with success");
-                videoAdapter.setArrayAdapter(videoArrayList);
-                showVideoData();
-            } else {
-                showErrorMsg();
-            }
         }
     }
 

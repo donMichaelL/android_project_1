@@ -2,7 +2,7 @@ package com.example.android.popularmovies.Parsers;
 
 import android.util.Log;
 
-import com.example.android.popularmovies.Pojo.Review;
+import com.example.android.popularmovies.models.Review;
 
 import org.json.JSONArray;
 import org.json.JSONException;
