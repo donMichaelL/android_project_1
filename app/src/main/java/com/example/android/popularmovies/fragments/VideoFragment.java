@@ -86,7 +86,7 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.activity_video_detail, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_video_detail, container, false);
         videoRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_video);
         tvErrorMsg = (TextView) rootView.findViewById(R.id.tv_error_msg_video);
         pgLoading = (ProgressBar) rootView.findViewById(R.id.pg_loading_video);

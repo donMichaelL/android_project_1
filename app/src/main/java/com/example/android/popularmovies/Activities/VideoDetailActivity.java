@@ -36,7 +36,7 @@ public class VideoDetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.video_detail);
+        setContentView(R.layout.activity_video_detail);
         Intent intent = getIntent();
         if (intent == null || !intent.hasExtra(MovieDetailActivity.MOVIE_ID)) {
             finish();
