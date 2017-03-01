@@ -65,6 +65,7 @@ public class VideoDetailActivity extends AppCompatActivity implements VideoAdapt
         videoRecyclerView.setLayoutManager(
                 new LinearLayoutManager(getBaseContext(),LinearLayoutManager.VERTICAL, false));
 
+        videoRecyclerView.setHasFixedSize(true);
         videoRecyclerView.setAdapter(videoAdapter);
 
         if(savedInstanceState == null || !savedInstanceState.containsKey(VIDEO_ARRAY_LIST)) {

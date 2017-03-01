@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         movieRecyclerView.setLayoutManager(new GridLayoutManager(getBaseContext(), getResources().getInteger(R.integer.movies_per_row), GridLayoutManager.VERTICAL, false));
         movieAdapter = new MovieAdapter(this, this, this);
+        movieRecyclerView.setHasFixedSize(true);
         movieRecyclerView.setAdapter(movieAdapter);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

@@ -101,6 +101,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         ratingBar.setRating(returnRatingBase5(Float.parseFloat(selectedMovie.getVoteAverage())));
         tvRating.setText(selectedMovie.getVoteAverage() + "/10");
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(reviewAdapter);
 
         btnVideoDetailActivity.setOnClickListener(new View.OnClickListener() {
