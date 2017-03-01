@@ -1,6 +1,10 @@
 package com.example.android.popularmovies.fragments;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -47,6 +51,8 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
     private TextView tvErrorMsg;
     private ProgressBar pgLoading;
 
+    private BroadcastReceiver internetChangeReceiver;
+
     private String movieId;
 
     @Override
@@ -68,6 +74,15 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
         movieId = getArguments().getString(MOVIE_ID);
         videoRecyclerView.setLayoutManager(
                 new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL, false));
+
+        internetChangeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (NetworkUtils.isOnline(context)){
+                    createAnyncTasForVideoMovieData(movieId);
+                }
+            }
+        };
     }
 
     @Override
@@ -80,6 +95,23 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
             videoAdapter.setArrayAdapter(videoArrayList);
         } else {
             createAnyncTasForVideoMovieData(movieId);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (internetChangeReceiver != null) {
+            IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            getActivity().registerReceiver(internetChangeReceiver, intentFilter);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (internetChangeReceiver != null) {
+            getActivity().unregisterReceiver(internetChangeReceiver);
         }
     }
 
@@ -146,7 +178,6 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
                 startActivity(intent);
             }else {
                 Toast.makeText(getActivity(), R.string.download_app, Toast.LENGTH_SHORT).show();
-
             }
         } else {
             Toast.makeText(getActivity(), R.string.only_videos_youtube, Toast.LENGTH_SHORT).show();
