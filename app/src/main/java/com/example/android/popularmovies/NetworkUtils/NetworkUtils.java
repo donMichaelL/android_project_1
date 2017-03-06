@@ -38,36 +38,12 @@ public final class NetworkUtils {
     private final static String API_PARAM = "api_key";
     private final static String PAGE_PARAM = "page";
 
-    public final static String ORDERING_POPULARITY = "popularity";
-    public final static String ORDERING_VOTES = "vote_average";
+    public final static String ORDERING_POPULARITY = "popular";
+    public final static String ORDERING_VOTES = "top_rated";
 
     public final static String YOUTUBE = "https://www.youtube.com/watch";
     public final static String YOUTUBE_WATCH = "v";
 
-
-
-    public static URL buildUrlForQueryOrderingMovieDB(String orderingParam, int pageNumber) {
-        String baseUrl;
-        if( orderingParam.equals(ORDERING_POPULARITY)){
-            baseUrl = BASE_URL.concat("popular");
-        }else {
-            baseUrl = BASE_URL.concat("top_rated");
-        }
-        Uri buildUri = Uri.parse(baseUrl).buildUpon()
-                .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
-                .appendQueryParameter(PAGE_PARAM, Integer.toString(pageNumber))
-                .build();
-
-        Log.d(TAG, "The requested url: " + buildUri.toString());
-
-        URL returnedUrl= null;
-        try {
-            returnedUrl = new URL(buildUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return returnedUrl;
-    }
 
 
     public static URL buildUrlForImages(String imageExtention){
@@ -109,24 +85,5 @@ public final class NetworkUtils {
             return new ApiError();
         }
         return apiError;
-    }
-
-
-    public static String getResponseFromHttpUrl(URL url) throws IOException{
-        Log.d(TAG, "Trying to connect and get Data from " + url.toString());
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        try {
-            InputStream in = urlConnection.getInputStream();
-            Scanner scanner = new Scanner(in);
-            scanner.useDelimiter("\\A");
-            boolean hasInput = scanner.hasNext();
-            if (hasInput) {
-                return scanner.next();
-            } else {
-                return null;
-            }
-        } finally {
-            urlConnection.disconnect();
-        }
     }
 }

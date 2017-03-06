@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.support.annotation.IntegerRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -24,14 +25,22 @@ import android.widget.TextView;
 
 import com.example.android.popularmovies.Adapters.MovieAdapter;
 import com.example.android.popularmovies.BuildConfig;
+import com.example.android.popularmovies.api.ApiClient;
+import com.example.android.popularmovies.api.ApiInterface;
+import com.example.android.popularmovies.models.ApiError;
 import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.Parsers.MoviesParser;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.models.MovieResponse;
 
 import java.net.URL;
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements MovieAdapter.ListItemClickListener, MovieAdapter.OnLoadMoreListener, LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -47,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private ArrayList<Movie> movieArrayList;
     private int totalPages;
-    private int currentPage = 1;
+    private int currentPage = 0;
     private MovieAdapter movieAdapter;
 
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -74,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         movieAdapter = new MovieAdapter(this, this, this);
         movieRecyclerView.setHasFixedSize(true);
         movieRecyclerView.setAdapter(movieAdapter);
+        movieArrayList = new ArrayList<>();
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -82,10 +92,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                     movieAdapter.setMovieArrayList(null, true);
                     getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, MainActivity.this);
                 }else {
-                    movieArrayList = null;
-                    currentPage = 1 ;
-                    movieAdapter.setMovieArrayList(null, false);
-                    createAsyncTaskForMovieData(choice);
+                    clearBeforeReloadData();
+                    createTaskForRetrievingMovieData(choice);
                 }
 
             }
@@ -93,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
         if(savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_ARRAY_LIST)){
             choice = NetworkUtils.ORDERING_POPULARITY;
-            createAsyncTaskForMovieData(choice);
+            createTaskForRetrievingMovieData(choice);
         } else {
             movieArrayList = savedInstanceState.getParcelableArrayList(MOVIE_ARRAY_LIST);
             choice = savedInstanceState.getString(CHOICE);
@@ -107,17 +115,45 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (!choice.equals(FAVOURITE_CHOICE) && NetworkUtils.isOnline(context)) {
-                    makeOrderingQueryInMovieDb(choice);
+                   // makeOrderingQueryInMovieDb(choice);
                 }
             }
         };
     }
 
-    private void createAsyncTaskForMovieData(String orderingParam){
+    private void createTaskForRetrievingMovieData(String orderingParam){
         if(NetworkUtils.isOnline(this)){
-            makeOrderingQueryInMovieDb(orderingParam);
+            showLoading();
+            ApiInterface apiInterface = ApiClient.retrofitVideoBuilder().create(ApiInterface.class);
+            Call<MovieResponse> call = apiInterface.getMoviesWithFilter(orderingParam, MainActivity.API_KEY, Integer.toString(currentPage+1));
+            Log.d(TAG, call.request().url().toString());
+            call.enqueue(new Callback<MovieResponse>() {
+                @Override
+                public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
+                    if (response.isSuccessful()){
+                        totalPages = Integer.parseInt(response.body().getTotalPages());
+                        currentPage = Integer.parseInt(response.body().getPage());
+                        //Log.d(TAG, response.body().getResults().get(1).getOriginalTitle());
+                        movieArrayList.addAll(response.body().getResults());
+                        if (currentPage == totalPages) {
+                            movieAdapter.setMovieArrayList(movieArrayList, true);
+                        }else {
+                            movieAdapter.setMovieArrayList(movieArrayList, false);
+                        }
+                        showMovieData();
+                    } else {
+                        ApiError apiError = NetworkUtils.parseError(response);
+                        showErrorMsg(apiError.getMessage());
+                    }
+                }
+                @Override
+                public void onFailure(Call<MovieResponse> call, Throwable t) {
+                    showErrorMsg(getResources().getString(R.string.error_msg));
+                }
+            });
+
         } else{
-            showErrorMsg();
+            showErrorMsg(getResources().getString(R.string.error_msg));
         }
     }
 
@@ -136,11 +172,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
         super.onSaveInstanceState(outState);
     }
 
-    private void makeOrderingQueryInMovieDb(String orderingParam){
-        URL requestURL = NetworkUtils.buildUrlForQueryOrderingMovieDB(orderingParam, currentPage);
-        new MovieDBApiQueryTask().execute(requestURL);
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
@@ -153,12 +184,12 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
             case R.id.sort_by_popularity:
                 clearBeforeReloadData();
                 choice = NetworkUtils.ORDERING_POPULARITY;
-                createAsyncTaskForMovieData(choice);
+                createTaskForRetrievingMovieData(choice);
                 break;
             case R.id.sort_by_votes:
                 clearBeforeReloadData();
                 choice = NetworkUtils.ORDERING_VOTES;
-                createAsyncTaskForMovieData(choice);
+                createTaskForRetrievingMovieData(choice);
                 break;
             case R.id.sort_by_favourite:
                 clearBeforeReloadData();
@@ -171,12 +202,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     private void clearBeforeReloadData(){
         movieAdapter.setMovieArrayList(null, false);
-        currentPage = 1;
-        movieArrayList = null;
+        movieArrayList = new ArrayList<>();
+        currentPage = 0;
     }
 
-    private void showErrorMsg(){
+    private void showErrorMsg(String message){
         movieRecyclerView.setVisibility(View.INVISIBLE);
+        tvErrorMsg.setText(message);
         tvErrorMsg.setVisibility(View.VISIBLE);
         pgLoading.setVisibility(View.INVISIBLE);
         swipeRefreshLayout.setRefreshing(false);
@@ -185,6 +217,15 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     private void showMovieData(){
         movieRecyclerView.setVisibility(View.VISIBLE);
         tvErrorMsg.setVisibility(View.INVISIBLE);
+        pgLoading.setVisibility(View.INVISIBLE);
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    private void showLoading() {
+        if (currentPage == 0)
+            movieRecyclerView.setVisibility(View.INVISIBLE);
+        tvErrorMsg.setVisibility(View.INVISIBLE);
+        pgLoading.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -197,10 +238,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
 
     @Override
     public void onLoadMore() {
-        if (currentPage < totalPages) {
-            currentPage++;
-            createAsyncTaskForMovieData(choice);
-        }
+        createTaskForRetrievingMovieData(choice);
     }
 
     @Override
@@ -276,51 +314,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         movieAdapter.setMovieArrayList(null, true);
-    }
-
-
-
-
-    public class MovieDBApiQueryTask extends AsyncTask<URL, Void, ArrayList<Movie>>{
-
-        @Override
-        protected void onPreExecute() {
-            pgLoading.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected ArrayList doInBackground(URL... params) {
-            Log.d(TAG, "Asynchronous Task is stating retrieving data.");
-            URL requestUrl = params[0];
-            try {
-                String responseString = NetworkUtils.getResponseFromHttpUrl(requestUrl);
-                totalPages = MoviesParser.getTotalPages(responseString);
-                return MoviesParser.getSimpleStringFromJson(responseString);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Movie> returnedMovieArrayList) {
-            pgLoading.setVisibility(View.INVISIBLE);
-            swipeRefreshLayout.setRefreshing(false);
-            if(returnedMovieArrayList != null ) {
-                Log.d(TAG, "Data received with success");
-                if (movieArrayList == null) {
-                    movieArrayList = returnedMovieArrayList;
-                }else {
-                    movieArrayList.addAll(returnedMovieArrayList);
-                }
-                showMovieData();
-                movieAdapter.setMovieArrayList(movieArrayList, false);
-            }else {
-                showErrorMsg();
-            }
-
-        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.api;
 
+import com.example.android.popularmovies.models.MovieResponse;
 import com.example.android.popularmovies.models.ReviewResponse;
 import com.example.android.popularmovies.models.VideoResponse;
 
@@ -19,4 +20,7 @@ public interface ApiInterface {
 
     @GET("{id}/reviews")
     Call<ReviewResponse> getReviewFromId(@Path("id") String id, @Query("api_key") String api_key);
+
+    @GET("{filter}")
+    Call<MovieResponse> getMoviesWithFilter(@Path("filter") String filter, @Query("api_key") String api_key, @Query("page") String page);
 }
