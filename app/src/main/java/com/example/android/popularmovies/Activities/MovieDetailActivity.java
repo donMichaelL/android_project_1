@@ -159,8 +159,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onResume() {
+        super.onResume();
         if (internetChangeReceiver != null) {
             IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
             this.registerReceiver(internetChangeReceiver, intentFilter);
@@ -168,8 +168,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (internetChangeReceiver != null) {
             this.unregisterReceiver(internetChangeReceiver);
         }

@@ -122,17 +122,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        if (internetChangeReceiver != null) {
-            IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-            this.registerReceiver(internetChangeReceiver, intentFilter);
-        }
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (internetChangeReceiver != null) {
             this.unregisterReceiver(internetChangeReceiver);
         }
@@ -215,6 +206,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     @Override
     public void onResume() {
         super.onResume();
+        if (internetChangeReceiver != null) {
+            IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+            this.registerReceiver(internetChangeReceiver, intentFilter);
+        }
         if (choice.equals(FAVOURITE_CHOICE)) {
             getSupportLoaderManager().restartLoader(CURSOR_LOADER_ID, null, this);
         }
