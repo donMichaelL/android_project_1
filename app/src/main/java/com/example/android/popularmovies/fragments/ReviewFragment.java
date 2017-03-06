@@ -77,7 +77,7 @@ public class ReviewFragment extends Fragment {
             showLoading();
             Retrofit retrofit = ApiClient.retrofitVideoBuilder();
             ApiInterface retrofitInterface = retrofit.create(ApiInterface.class);
-            Call<ReviewResponse> call = retrofitInterface.getReviewFromId(id, "2");
+            Call<ReviewResponse> call = retrofitInterface.getReviewFromId(id, MainActivity.API_KEY);
             Log.d(TAG, call.request().url().toString());
             call.enqueue(new Callback<ReviewResponse>() {
                 @Override
