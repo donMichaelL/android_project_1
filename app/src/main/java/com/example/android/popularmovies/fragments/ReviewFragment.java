@@ -18,6 +18,7 @@ import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.api.ApiClient;
 import com.example.android.popularmovies.api.ApiInterface;
+import com.example.android.popularmovies.models.ApiError;
 import com.example.android.popularmovies.models.Review;
 import com.example.android.popularmovies.models.ReviewResponse;
 
@@ -76,13 +77,13 @@ public class ReviewFragment extends Fragment {
             showLoading();
             Retrofit retrofit = ApiClient.retrofitVideoBuilder();
             ApiInterface retrofitInterface = retrofit.create(ApiInterface.class);
-            Call<ReviewResponse> call = retrofitInterface.getReviewFromId(id, MainActivity.API_KEY);
+            Call<ReviewResponse> call = retrofitInterface.getReviewFromId(id, "2");
             Log.d(TAG, call.request().url().toString());
             call.enqueue(new Callback<ReviewResponse>() {
                 @Override
                 public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
-                    reviewArrayList = response.body().getResults();
                     if (response.isSuccessful()) {
+                        reviewArrayList = response.body().getResults();
                         if (reviewArrayList.size() == NO_COMMENT){
                             showNoComments();
                         } else {
@@ -90,16 +91,17 @@ public class ReviewFragment extends Fragment {
                         }
                         reviewAdapter.setArrayListReview(reviewArrayList);
                     } else {
-                        showErrorMsg();
+                        ApiError apiError = NetworkUtils.parseError(response);
+                        showErrorMsg(apiError.getMessage());
                     }
                 }
                 @Override
                 public void onFailure(Call<ReviewResponse> call, Throwable t) {
-                    showErrorMsg();
+                    showErrorMsg(getResources().getString(R.string.error_msg));
                 }
             });
         } else {
-            showErrorMsg();
+            showErrorMsg(getResources().getString(R.string.error_msg));
         }
     }
 
@@ -117,8 +119,9 @@ public class ReviewFragment extends Fragment {
         pgLoadingReview.setVisibility(View.VISIBLE);
     }
 
-    private void showErrorMsg() {
+    private void showErrorMsg(String message) {
         tvNoComments.setVisibility(View.INVISIBLE);
+        tvErrorMsgReview.setText(message);
         tvErrorMsgReview.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.INVISIBLE);
         pgLoadingReview.setVisibility(View.INVISIBLE);
