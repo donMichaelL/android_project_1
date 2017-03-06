@@ -58,7 +58,6 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
         videoAdapter = new VideoAdapter(this);
     }
 
@@ -93,8 +92,10 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
         if (savedInstanceState!=null && savedInstanceState.containsKey(VIDEO_ARRAY_LIST)) {
             videoArrayList = savedInstanceState.getParcelableArrayList(VIDEO_ARRAY_LIST);
             videoAdapter.setArrayAdapter(videoArrayList);
+            Log.d(TAG, "RETAIN");
         } else {
             createAnyncTasForVideoMovieData(movieId);
+            Log.d(TAG, "NOT RETAIN");
         }
     }
 
@@ -169,7 +170,6 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
-        Log.d(TAG, videoArrayList.get(clickedItemIndex).getName());
         Video video = videoArrayList.get(clickedItemIndex);
         Uri sendingUri = NetworkUtils.buildUrlForVideo(video.getSite(), video.getKey());
         if (sendingUri != null){
