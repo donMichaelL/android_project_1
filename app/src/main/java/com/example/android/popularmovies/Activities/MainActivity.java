@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
-import android.support.annotation.IntegerRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -29,13 +27,11 @@ import com.example.android.popularmovies.api.ApiClient;
 import com.example.android.popularmovies.api.ApiInterface;
 import com.example.android.popularmovies.models.ApiError;
 import com.example.android.popularmovies.models.Movie;
-import com.example.android.popularmovies.Parsers.MoviesParser;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.models.MovieResponse;
 
-import java.net.URL;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -133,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
                     if (response.isSuccessful()){
                         totalPages = Integer.parseInt(response.body().getTotalPages());
                         currentPage = Integer.parseInt(response.body().getPage());
-                        //Log.d(TAG, response.body().getResults().get(1).getOriginalTitle());
                         movieArrayList.addAll(response.body().getResults());
                         if (currentPage == totalPages) {
                             movieAdapter.setMovieArrayList(movieArrayList, true);
