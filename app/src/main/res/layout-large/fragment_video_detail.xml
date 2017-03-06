@@ -12,6 +12,14 @@
     </android.support.v7.widget.RecyclerView>
 
     <TextView
+        android:id="@+id/tv_no_videos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_videos"
+        android:visibility="invisible"
+        android:textSize="15sp"/>
+
+    <TextView
         android:id="@+id/tv_error_msg_video"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
