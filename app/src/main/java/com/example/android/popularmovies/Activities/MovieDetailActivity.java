@@ -46,9 +46,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getName();
 
     public static final String MOVIE_ID = "movie_id";
-    private static final String REVIEW_ARRAY_LIST_LABEL ="review_array_list";
     private static final String USER_LIKES_MOVIE = "user_likes_movie";
-    private static final int NO_COMMENT = 0;
     private static final String REVIEW_TAG = "review_fragment";
 
     private ImageView headerImage;
@@ -157,7 +155,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if (NetworkUtils.isOnline(context)) {
                     Log.d(TAG, "HELLO");
-//                    startRetrieveReviews(selectedMovie.getId());
+                    //startRetrieveReviews(selectedMovie.getId());
                 }
             }
         };

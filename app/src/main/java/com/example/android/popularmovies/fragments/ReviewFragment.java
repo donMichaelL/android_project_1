@@ -47,7 +47,6 @@ public class ReviewFragment extends Fragment {
 
     private ReviewAdapter reviewAdapter;
     private ArrayList<Review> reviewArrayList;
-    private String movieId;
 
 
     @Nullable
