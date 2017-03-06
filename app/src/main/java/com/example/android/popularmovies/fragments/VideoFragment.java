@@ -59,21 +59,7 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         videoAdapter = new VideoAdapter(this);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        /* TOCHECK It seems that these should go to onCreate
-        but i cannot call getActivity() */
-        if (getArguments()== null || !getArguments().containsKey(MOVIE_ID) ) {
-           getActivity().finish();
-        }
-
         movieId = getArguments().getString(MOVIE_ID);
-        videoRecyclerView.setLayoutManager(
-                new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL, false));
-
         internetChangeReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -85,10 +71,24 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
     }
 
     @Override
-    public void onViewStateRestored(Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-        /* TOCHECK  It seems that these code must go to onCreate
-        * the problem is that views are not instantiated yet */
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (getArguments()== null || !getArguments().containsKey(MOVIE_ID) ) {
+           getActivity().finish();
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_video_detail, container, false);
+        videoRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_video);
+        tvErrorMsg = (TextView) rootView.findViewById(R.id.tv_error_msg_video);
+        pgLoading = (ProgressBar) rootView.findViewById(R.id.pg_loading_video);
+        videoRecyclerView.setAdapter(videoAdapter);
+        videoRecyclerView.setHasFixedSize(true);
+        videoRecyclerView.setLayoutManager(
+                new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL, false));
         if (savedInstanceState!=null && savedInstanceState.containsKey(VIDEO_ARRAY_LIST)) {
             videoArrayList = savedInstanceState.getParcelableArrayList(VIDEO_ARRAY_LIST);
             videoAdapter.setArrayAdapter(videoArrayList);
@@ -97,6 +97,7 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
             createAnyncTasForVideoMovieData(movieId);
             Log.d(TAG, "NOT RETAIN");
         }
+        return rootView;
     }
 
     @Override
@@ -114,18 +115,6 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
         if (internetChangeReceiver != null) {
             getActivity().unregisterReceiver(internetChangeReceiver);
         }
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_video_detail, container, false);
-        videoRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_video);
-        tvErrorMsg = (TextView) rootView.findViewById(R.id.tv_error_msg_video);
-        pgLoading = (ProgressBar) rootView.findViewById(R.id.pg_loading_video);
-        videoRecyclerView.setAdapter(videoAdapter);
-        videoRecyclerView.setHasFixedSize(true);
-        return rootView;
     }
 
     private void createAnyncTasForVideoMovieData(String id) {
