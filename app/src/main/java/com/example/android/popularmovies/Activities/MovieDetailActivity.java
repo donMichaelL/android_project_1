@@ -1,5 +1,7 @@
 package com.example.android.popularmovies.Activities;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,6 +25,7 @@ import android.widget.Toast;
 
 import com.example.android.popularmovies.api.ApiClient;
 import com.example.android.popularmovies.api.ApiInterface;
+import com.example.android.popularmovies.fragments.ReviewFragment;
 import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.models.Review;
@@ -46,6 +49,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private static final String REVIEW_ARRAY_LIST_LABEL ="review_array_list";
     private static final String USER_LIKES_MOVIE = "user_likes_movie";
     private static final int NO_COMMENT = 0;
+    private static final String REVIEW_TAG = "review_fragment";
 
     private ImageView headerImage;
     private ImageView thumbnail;
@@ -55,15 +59,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView tvRating;
     private TextView tvReleaseDate;
     private Button btnVideoDetailActivity;
-    private RecyclerView recyclerView;
-    private TextView tvNoComments;
-    private TextView tvErrorMsgReview;
-    private ProgressBar pgLoadingReview;
     private Button btnLike;
     private boolean userLikesMovie;
 
-    private ArrayList<Review> reviewArrayList;
-    private ReviewAdapter reviewAdapter;
 
     private BroadcastReceiver internetChangeReceiver;
 
@@ -88,14 +86,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvRating = (TextView) findViewById(R.id.tv_rating);
         ratingBar = (RatingBar) findViewById(R.id.rating_bar);
         btnVideoDetailActivity = (Button) findViewById(R.id.btn_video_detail_activity);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_reviews);
-        tvNoComments = (TextView) findViewById(R.id.tv_no_comments);
-        tvErrorMsgReview = (TextView) findViewById(R.id.tv_error_msg_review);
-        pgLoadingReview = (ProgressBar) findViewById(R.id.pg_loading_review);
         btnLike = (Button) findViewById(R.id.btn_like_movie);
-
-        reviewArrayList = new ArrayList<>();
-        reviewAdapter = new ReviewAdapter();
 
 
         Picasso.with(this).load(NetworkUtils.buildUrlForImages(selectedMovie.getBackdropPath()).toString()).into(headerImage);
@@ -105,9 +96,20 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvReleaseDate.setText(selectedMovie.getReleaseDate());
         ratingBar.setRating(returnRatingBase5(Float.parseFloat(selectedMovie.getVoteAverage())));
         tvRating.setText(selectedMovie.getVoteAverage() + "/10");
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(reviewAdapter);
+
+
+        ReviewFragment reviewFragment;
+        FragmentManager fm = getFragmentManager();
+        reviewFragment = (ReviewFragment) fm.findFragmentByTag(REVIEW_TAG);
+        if (reviewFragment == null) {
+            FragmentTransaction ft = fm.beginTransaction();
+            reviewFragment = new ReviewFragment();
+            Bundle a = new Bundle();
+            a.putString(ReviewFragment.REVIEW_ID, selectedMovie.getId());
+            reviewFragment.setArguments(a);
+            ft.add(R.id.review_fragment, reviewFragment, REVIEW_TAG);
+            ft.commit();
+        }
 
         btnVideoDetailActivity.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,11 +141,8 @@ public class MovieDetailActivity extends AppCompatActivity {
 
 
         if (savedInstanceState != null) {
-            reviewArrayList = savedInstanceState.getParcelableArrayList(REVIEW_ARRAY_LIST_LABEL);
-            reviewAdapter.setArrayListReview(reviewArrayList);
             userLikesMovie = savedInstanceState.getBoolean(USER_LIKES_MOVIE);
         } else {
-            startRetrieveReviews(selectedMovie.getId());
             userLikesMovie = checkUserLikesTheMovie(selectedMovie.getId());
         }
 
@@ -158,7 +157,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             public void onReceive(Context context, Intent intent) {
                 if (NetworkUtils.isOnline(context)) {
                     Log.d(TAG, "HELLO");
-                    startRetrieveReviews(selectedMovie.getId());
+//                    startRetrieveReviews(selectedMovie.getId());
                 }
             }
         };
@@ -225,75 +224,12 @@ public class MovieDetailActivity extends AppCompatActivity {
         return true;
     }
 
-    private void startRetrieveReviews(String id) {
-        if (NetworkUtils.isOnline(this)){
-            showLoading();
-            Retrofit retrofit = ApiClient.retrofitVideoBuilder();
-            ApiInterface retrofitInterface = retrofit.create(ApiInterface.class);
-            Call<ReviewResponse> call = retrofitInterface.getReviewFromId(id, MainActivity.API_KEY);
-            Log.d(TAG, call.request().url().toString());
-            call.enqueue(new Callback<ReviewResponse>() {
-                @Override
-                public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
-                    ArrayList<Review> results = response.body().getResults();
-                    if (response.isSuccessful()) {
-                        if (results.size() == NO_COMMENT){
-                            showNoComments();
-                        } else {
-                            showReviews();
-                        }
-                        reviewAdapter.setArrayListReview(results);
-                    } else {
-                        showErrorMsg();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ReviewResponse> call, Throwable t) {
-                    showErrorMsg();
-                }
-            });
-        } else {
-            showErrorMsg();
-        }
-    }
-
     private Float returnRatingBase5(Float voteAverage){
         return voteAverage/2;
     }
 
-
-    private void showReviews() {
-        tvNoComments.setVisibility(View.INVISIBLE);
-        recyclerView.setVisibility(View.VISIBLE);
-        tvErrorMsgReview.setVisibility(View.INVISIBLE);
-        pgLoadingReview.setVisibility(View.INVISIBLE);
-    }
-
-    private void showLoading(){
-        tvNoComments.setVisibility(View.INVISIBLE);
-        recyclerView.setVisibility(View.INVISIBLE);
-        tvErrorMsgReview.setVisibility(View.INVISIBLE);
-        pgLoadingReview.setVisibility(View.VISIBLE);
-    }
-
-    private void showErrorMsg() {
-        tvNoComments.setVisibility(View.INVISIBLE);
-        tvErrorMsgReview.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.INVISIBLE);
-        pgLoadingReview.setVisibility(View.INVISIBLE);
-    }
-
-    private void showNoComments(){
-        recyclerView.setVisibility(View.INVISIBLE);
-        tvNoComments.setVisibility(View.VISIBLE);
-        tvErrorMsgReview.setVisibility(View.INVISIBLE);
-        pgLoadingReview.setVisibility(View.INVISIBLE);
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelableArrayList(REVIEW_ARRAY_LIST_LABEL, reviewArrayList);
         outState.putBoolean(USER_LIKES_MOVIE, userLikesMovie);
         super.onSaveInstanceState(outState);
     }
