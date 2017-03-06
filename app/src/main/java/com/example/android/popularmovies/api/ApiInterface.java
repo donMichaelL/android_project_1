@@ -1,5 +1,6 @@
 package com.example.android.popularmovies.api;
 
+import com.example.android.popularmovies.models.ReviewResponse;
 import com.example.android.popularmovies.models.VideoResponse;
 
 import retrofit2.Call;
@@ -15,4 +16,7 @@ public interface ApiInterface {
 
     @GET("{id}/videos")
     Call<VideoResponse> getVideoFromId(@Path("id") String id, @Query("api_key") String api_key);
+
+    @GET("{id}/reviews")
+    Call<ReviewResponse> getReviewFromId(@Path("id") String id, @Query("api_key") String api_key);
 }

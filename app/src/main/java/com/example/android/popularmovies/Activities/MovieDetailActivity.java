@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,17 +21,23 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.popularmovies.api.ApiClient;
+import com.example.android.popularmovies.api.ApiInterface;
 import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.models.Review;
-import com.example.android.popularmovies.Parsers.ReviewParser;
 import com.example.android.popularmovies.Adapters.ReviewAdapter;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.models.ReviewResponse;
 import com.squareup.picasso.Picasso;
 
-import java.net.URL;
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getName();
@@ -138,7 +143,7 @@ public class MovieDetailActivity extends AppCompatActivity {
             reviewAdapter.setArrayListReview(reviewArrayList);
             userLikesMovie = savedInstanceState.getBoolean(USER_LIKES_MOVIE);
         } else {
-            startAsyncTaskRetrieveReviews(selectedMovie.getId());
+            startRetrieveReviews(selectedMovie.getId());
             userLikesMovie = checkUserLikesTheMovie(selectedMovie.getId());
         }
 
@@ -151,8 +156,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         internetChangeReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                if (NetworkUtils.isOnline(context)){
-                    new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(selectedMovie.getId()));
+                if (NetworkUtils.isOnline(context)) {
+                    Log.d(TAG, "HELLO");
+                    startRetrieveReviews(selectedMovie.getId());
                 }
             }
         };
@@ -219,9 +225,34 @@ public class MovieDetailActivity extends AppCompatActivity {
         return true;
     }
 
-    private void startAsyncTaskRetrieveReviews(String id) {
+    private void startRetrieveReviews(String id) {
         if (NetworkUtils.isOnline(this)){
-            new MovieDBReviewQueryTask().execute(NetworkUtils.buildUrlForReviewVideoMovieDB(id));
+            showLoading();
+            Retrofit retrofit = ApiClient.retrofitVideoBuilder();
+            ApiInterface retrofitInterface = retrofit.create(ApiInterface.class);
+            Call<ReviewResponse> call = retrofitInterface.getReviewFromId(id, MainActivity.API_KEY);
+            Log.d(TAG, call.request().url().toString());
+            call.enqueue(new Callback<ReviewResponse>() {
+                @Override
+                public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
+                    ArrayList<Review> results = response.body().getResults();
+                    if (results != null) {
+                        if (results.size() == NO_COMMENT){
+                            showNoComments();
+                        } else {
+                            showReviews();
+                        }
+                        reviewAdapter.setArrayListReview(results);
+                    } else {
+                        showErrorMsg();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ReviewResponse> call, Throwable t) {
+                    showErrorMsg();
+                }
+            });
         } else {
             showErrorMsg();
         }
@@ -231,59 +262,33 @@ public class MovieDetailActivity extends AppCompatActivity {
         return voteAverage/2;
     }
 
-    private class MovieDBReviewQueryTask extends AsyncTask<URL, Void, ArrayList<Review>>{
-        @Override
-        protected void onPreExecute() {
-
-            pgLoadingReview.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected ArrayList<Review> doInBackground(URL... params) {
-            Log.d(TAG, "Asynchronous Task is stating retrieving review data.");
-            URL  requestUrl = params[0];
-            try {
-                String result = NetworkUtils.getResponseFromHttpUrl(requestUrl);
-                reviewArrayList = ReviewParser.getSimpleStringFromJson(result);
-                return reviewArrayList;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<Review> reviews) {
-            pgLoadingReview.setVisibility(View.INVISIBLE);
-            if (reviews != null){
-                if (reviews.size() == NO_COMMENT) {
-                    showNoComments();
-                } else {
-                    showReviews();
-                }
-                reviewAdapter.setArrayListReview(reviews);
-            }else{
-                showErrorMsg();
-            }
-        }
-    }
 
     private void showReviews() {
         tvNoComments.setVisibility(View.INVISIBLE);
         recyclerView.setVisibility(View.VISIBLE);
         tvErrorMsgReview.setVisibility(View.INVISIBLE);
+        pgLoadingReview.setVisibility(View.INVISIBLE);
+    }
+
+    private void showLoading(){
+        tvNoComments.setVisibility(View.INVISIBLE);
+        recyclerView.setVisibility(View.INVISIBLE);
+        tvErrorMsgReview.setVisibility(View.INVISIBLE);
+        pgLoadingReview.setVisibility(View.VISIBLE);
     }
 
     private void showErrorMsg() {
         tvNoComments.setVisibility(View.INVISIBLE);
         tvErrorMsgReview.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.INVISIBLE);
+        pgLoadingReview.setVisibility(View.INVISIBLE);
     }
 
     private void showNoComments(){
         recyclerView.setVisibility(View.INVISIBLE);
         tvNoComments.setVisibility(View.VISIBLE);
         tvErrorMsgReview.setVisibility(View.INVISIBLE);
+        pgLoadingReview.setVisibility(View.INVISIBLE);
     }
 
     @Override

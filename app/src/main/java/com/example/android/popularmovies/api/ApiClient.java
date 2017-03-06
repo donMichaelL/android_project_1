@@ -9,15 +9,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     private final static String BASE_URL = "https://api.themoviedb.org/3/movie/";
-    private static Retrofit retrofit = null;
+    private static Retrofit retrofitVideo = null;
 
     public static Retrofit retrofitVideoBuilder(){
-        if (retrofit == null) {
-            retrofit = new Retrofit.Builder()
+        if (retrofitVideo == null) {
+            retrofitVideo = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-        return retrofit;
+        return retrofitVideo;
     }
 }
