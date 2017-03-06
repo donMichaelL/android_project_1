@@ -236,7 +236,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<ReviewResponse> call, Response<ReviewResponse> response) {
                     ArrayList<Review> results = response.body().getResults();
-                    if (results != null) {
+                    if (response.isSuccessful()) {
                         if (results.size() == NO_COMMENT){
                             showNoComments();
                         } else {

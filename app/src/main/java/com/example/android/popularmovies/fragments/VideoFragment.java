@@ -49,6 +49,7 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
 
     private RecyclerView videoRecyclerView;
     private TextView tvErrorMsg;
+    private TextView tvNoVideo;
     private ProgressBar pgLoading;
 
     private BroadcastReceiver internetChangeReceiver;
@@ -64,6 +65,7 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (NetworkUtils.isOnline(context)){
+                    Log.d(TAG, "JELLO");
                     createAnyncTasForVideoMovieData(movieId);
                 }
             }
@@ -85,6 +87,7 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
         videoRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_video);
         tvErrorMsg = (TextView) rootView.findViewById(R.id.tv_error_msg_video);
         pgLoading = (ProgressBar) rootView.findViewById(R.id.pg_loading_video);
+        tvNoVideo = (TextView) rootView.findViewById(R.id.tv_no_videos);
         videoRecyclerView.setAdapter(videoAdapter);
         videoRecyclerView.setHasFixedSize(true);
         videoRecyclerView.setLayoutManager(
@@ -122,15 +125,18 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
             ApiInterface apiInterface = ApiClient.retrofitVideoBuilder().create(ApiInterface.class);
             Call<VideoResponse> call = apiInterface.getVideoFromId(id, MainActivity.API_KEY);
             Log.d(TAG, call.request().url().toString());
-            pgLoading.setVisibility(View.VISIBLE);
+            showLoading();
             call.enqueue(new Callback<VideoResponse>() {
                 @Override
                 public void onResponse(Call<VideoResponse> call, Response<VideoResponse> response) {
-                    pgLoading.setVisibility(View.INVISIBLE);
                     if (response.isSuccessful()) {
                         videoArrayList = response.body().getResults();
                         videoAdapter.setArrayAdapter(videoArrayList);
-                        showVideoData();
+                        if (videoArrayList.size() == 0) {
+                            showNoVideo();
+                        } else {
+                            showVideoData();
+                        }
                     } else {
                         showErrorMsg();
                     }
@@ -150,11 +156,29 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
     private void showErrorMsg(){
         videoRecyclerView.setVisibility(View.INVISIBLE);
         tvErrorMsg.setVisibility(View.VISIBLE);
+        pgLoading.setVisibility(View.INVISIBLE);
+        tvNoVideo.setVisibility(View.INVISIBLE);
+    }
+
+    private void showNoVideo() {
+        videoRecyclerView.setVisibility(View.INVISIBLE);
+        tvErrorMsg.setVisibility(View.INVISIBLE);
+        pgLoading.setVisibility(View.INVISIBLE);
+        tvNoVideo.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoading() {
+        videoRecyclerView.setVisibility(View.INVISIBLE);
+        tvErrorMsg.setVisibility(View.INVISIBLE);
+        pgLoading.setVisibility(View.VISIBLE);
+        tvNoVideo.setVisibility(View.INVISIBLE);
     }
 
     private void showVideoData(){
         videoRecyclerView.setVisibility(View.VISIBLE);
         tvErrorMsg.setVisibility(View.INVISIBLE);
+        pgLoading.setVisibility(View.INVISIBLE);
+        tvNoVideo.setVisibility(View.INVISIBLE);
     }
 
     @Override

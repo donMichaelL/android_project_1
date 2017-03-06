@@ -11,4 +11,5 @@
     <string name="favourites">Favourites</string>
     <string name="votes">Votes</string>
     <string name="popularity">Popularity</string>
+    <string name="no_videos">tv_no_video</string>
 </resources>
