@@ -8,13 +8,20 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmovies.Activities.MainActivity;
+import com.example.android.popularmovies.api.ApiClient;
+import com.example.android.popularmovies.models.ApiError;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
+
+import okhttp3.ResponseBody;
+import retrofit2.Converter;
+import retrofit2.Response;
 
 /**
  * Created by Michalis on 1/27/2017.
@@ -62,23 +69,6 @@ public final class NetworkUtils {
         return returnedUrl;
     }
 
-    public static URL buildUrlForReviewVideoMovieDB(String id){
-        String baseUrl = BASE_URL + id + "/reviews";
-        Uri buildUri = Uri.parse(baseUrl).buildUpon()
-                .appendQueryParameter(API_PARAM, MainActivity.API_KEY)
-                .build();
-
-        Log.d(TAG, "The requested url:" + buildUri.toString());
-
-        URL returnedUrl = null;
-        try {
-            returnedUrl = new URL(buildUri.toString());
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        return  returnedUrl;
-    }
-
 
     public static URL buildUrlForImages(String imageExtention){
         URL imageUrl = null;
@@ -107,6 +97,18 @@ public final class NetworkUtils {
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
 
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public static ApiError parseError(Response<?> response) {
+        ApiError apiError;
+        Converter<ResponseBody, ApiError> converter = ApiClient
+                .retrofitVideoBuilder().responseBodyConverter(ApiError.class, new Annotation[0]);
+        try{
+            apiError = converter.convert(response.errorBody());
+        } catch (IOException e){
+            return new ApiError();
+        }
+        return apiError;
     }
 
 

@@ -25,6 +25,7 @@ import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.api.ApiClient;
 import com.example.android.popularmovies.api.ApiInterface;
+import com.example.android.popularmovies.models.ApiError;
 import com.example.android.popularmovies.models.Video;
 import com.example.android.popularmovies.models.VideoResponse;
 
@@ -95,10 +96,8 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
         if (savedInstanceState!=null && savedInstanceState.containsKey(VIDEO_ARRAY_LIST)) {
             videoArrayList = savedInstanceState.getParcelableArrayList(VIDEO_ARRAY_LIST);
             videoAdapter.setArrayAdapter(videoArrayList);
-            Log.d(TAG, "RETAIN");
         } else {
             createAnyncTasForVideoMovieData(movieId);
-            Log.d(TAG, "NOT RETAIN");
         }
         return rootView;
     }
@@ -138,23 +137,25 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
                             showVideoData();
                         }
                     } else {
-                        showErrorMsg();
+                        ApiError apiError = NetworkUtils.parseError(response);
+                        showErrorMsg(apiError.getMessage());
                     }
                 }
                 @Override
                 public void onFailure(Call<VideoResponse> call, Throwable t) {
-                    showErrorMsg();
+                    showErrorMsg(getResources().getString(R.string.error_msg));
                 }
             });
 
         }else {
             pgLoading.setVisibility(View.INVISIBLE);
-            showErrorMsg();
+            showErrorMsg(getResources().getString(R.string.error_msg));
         }
     }
 
-    private void showErrorMsg(){
+    private void showErrorMsg(String message){
         videoRecyclerView.setVisibility(View.INVISIBLE);
+        tvErrorMsg.setText(message);
         tvErrorMsg.setVisibility(View.VISIBLE);
         pgLoading.setVisibility(View.INVISIBLE);
         tvNoVideo.setVisibility(View.INVISIBLE);
