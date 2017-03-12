@@ -53,7 +53,7 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
-                return returnedCursor;
+                break;
             case MOVIE_GET_ONE:
                 returnedCursor = movieDBHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
@@ -64,10 +64,12 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
-                return returnedCursor;
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+        returnedCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return returnedCursor;
     }
 
     @Nullable
@@ -92,7 +94,6 @@ public class MovieProvider extends ContentProvider {
                         .insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 Log.d(TAG, "New element with id" + Long.toString(newRowId));
                 if (newRowId > 0){
-                    //TODO check this line
                     getContext().getContentResolver().notifyChange(uri, null);
                     return MovieContract.MovieEntry.buildFlavorsUri(newRowId);
                 }
@@ -112,7 +113,7 @@ public class MovieProvider extends ContentProvider {
                         .delete(MovieContract.MovieEntry.TABLE_NAME,
                                 MovieContract.MovieEntry.COLUMN_NAME_ID + " = ?",
                                 new String[] {selectionArgs[0]});
-                //TODO ask for reset _ID
+                getContext().getContentResolver().notifyChange(uri, null);
                 return deleteResult;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
