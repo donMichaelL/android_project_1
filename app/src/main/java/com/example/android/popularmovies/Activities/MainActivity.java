@@ -31,6 +31,7 @@ import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.data.MovieContract;
 import com.example.android.popularmovies.models.MovieResponse;
+import com.facebook.stetho.Stetho;
 
 import java.util.ArrayList;
 
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.List
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Stetho.initializeWithDefaults(this);
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         movieRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movie);
