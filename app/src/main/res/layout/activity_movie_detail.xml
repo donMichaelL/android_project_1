@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:orientation="vertical"
@@ -72,13 +72,7 @@
                     android:id="@+id/tv_rating"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
-                </LinearLayout>
-
-            <Button
-                android:id="@+id/btn_video_detail_activity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Videos"/>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/btn_like_movie"
@@ -111,22 +105,21 @@
             android:layout_height="wrap_content"
             android:padding="@dimen/activity_horizontal_margin"/>
 
-        <TextView
+        <android.support.design.widget.TabLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/reviews"
-            android:padding="@dimen/activity_horizontal_margin"
-            android:textAlignment="center"
-            android:textColor="@color/colorAccent"
-            android:textSize="24sp"
-            android:textStyle="normal|bold" />
+            app:tabMode="fixed"
+            app:tabGravity="fill"
+            android:id="@+id/tabs">
+        </android.support.design.widget.TabLayout>
 
-        <FrameLayout
+        <android.support.v4.view.ViewPager
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/review_fragment"/>
+            android:id="@+id/view_pager">
+        </android.support.v4.view.ViewPager>
+
 
     </LinearLayout>
 
-</android.support.v4.widget.NestedScrollView>
+</LinearLayout>

@@ -8,7 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -120,6 +120,7 @@ public class VideoFragment extends Fragment implements VideoAdapter.ListItemClic
     }
 
     private void createAnyncTasForVideoMovieData(String id) {
+        Log.d(TAG, "Network is called");
         if (NetworkUtils.isOnline(getActivity())){
             ApiInterface apiInterface = ApiClient.retrofitVideoBuilder().create(ApiInterface.class);
             Call<VideoResponse> call = apiInterface.getVideoFromId(id, MainActivity.API_KEY);

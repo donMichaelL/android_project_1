@@ -1,6 +1,6 @@
 package com.example.android.popularmovies.fragments;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -53,6 +53,7 @@ public class ReviewFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "Review Fragment is started");
         View rootView = inflater.inflate(R.layout.fragment_review, container, false);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_reviews);
         tvNoComments = (TextView) rootView.findViewById(R.id.tv_no_comments);

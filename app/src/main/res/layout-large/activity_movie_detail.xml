@@ -75,12 +75,6 @@
                     android:layout_height="wrap_content"/>
                 </LinearLayout>
 
-            <Button
-                android:layout_marginLeft="8dp"
-                android:id="@+id/btn_video_detail_activity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Videos"/>
 
             <Button
                 android:id="@+id/btn_like_movie"

@@ -1,7 +1,5 @@
 package com.example.android.popularmovies.Activities;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,37 +8,29 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.popularmovies.api.ApiClient;
-import com.example.android.popularmovies.api.ApiInterface;
 import com.example.android.popularmovies.fragments.ReviewFragment;
+import com.example.android.popularmovies.fragments.VideoFragment;
 import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
-import com.example.android.popularmovies.models.Review;
-import com.example.android.popularmovies.Adapters.ReviewAdapter;
 import com.example.android.popularmovies.R;
 import com.example.android.popularmovies.data.MovieContract;
-import com.example.android.popularmovies.models.ReviewResponse;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = MovieDetailActivity.class.getName();
@@ -56,8 +46,9 @@ public class MovieDetailActivity extends AppCompatActivity {
     private RatingBar ratingBar;
     private TextView tvRating;
     private TextView tvReleaseDate;
-    private Button btnVideoDetailActivity;
     private Button btnLike;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
     private boolean userLikesMovie;
 
 
@@ -83,8 +74,9 @@ public class MovieDetailActivity extends AppCompatActivity {
         tvReleaseDate = (TextView) findViewById(R.id.tv_release_date);
         tvRating = (TextView) findViewById(R.id.tv_rating);
         ratingBar = (RatingBar) findViewById(R.id.rating_bar);
-        btnVideoDetailActivity = (Button) findViewById(R.id.btn_video_detail_activity);
         btnLike = (Button) findViewById(R.id.btn_like_movie);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        viewPager = (ViewPager) findViewById(R.id.view_pager);
 
 
         Picasso.with(this).load(NetworkUtils.buildUrlForImages(selectedMovie.getBackdropPath()).toString()).into(headerImage);
@@ -95,28 +87,36 @@ public class MovieDetailActivity extends AppCompatActivity {
         ratingBar.setRating(returnRatingBase5(Float.parseFloat(selectedMovie.getVoteAverage())));
         tvRating.setText(selectedMovie.getVoteAverage() + "/10");
 
+        ReviewFragment reviewFragment = new ReviewFragment();
+        Bundle a = new Bundle();
+        a.putString(ReviewFragment.REVIEW_ID, selectedMovie.getId());
+        reviewFragment.setArguments(a);
 
-        ReviewFragment reviewFragment;
-        FragmentManager fm = getFragmentManager();
-        reviewFragment = (ReviewFragment) fm.findFragmentByTag(REVIEW_TAG);
-        if (reviewFragment == null) {
-            FragmentTransaction ft = fm.beginTransaction();
-            reviewFragment = new ReviewFragment();
-            Bundle a = new Bundle();
-            a.putString(ReviewFragment.REVIEW_ID, selectedMovie.getId());
-            reviewFragment.setArguments(a);
-            ft.add(R.id.review_fragment, reviewFragment, REVIEW_TAG);
-            ft.commit();
-        }
+        VideoFragment videoFragment = new VideoFragment();
+        Bundle b = new Bundle();
+        b.putString(VideoFragment.MOVIE_ID, selectedMovie.getId());
+        videoFragment.setArguments(b);
 
-        btnVideoDetailActivity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent1 = new Intent(MovieDetailActivity.this, VideoDetailActivity.class);
-                intent1.putExtra(MOVIE_ID, selectedMovie.getId());
-                startActivity(intent1);
-            }
-        });
+        ViewPagerAdapter fragmentAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        fragmentAdapter.addFragment(reviewFragment, "Reviews");
+        fragmentAdapter.addFragment(videoFragment, "Videos");
+        viewPager.setAdapter(fragmentAdapter);
+        tabLayout.setupWithViewPager(viewPager);
+
+
+//        ReviewFragment reviewFragment;
+//        FragmentManager fm = getFragmentManager();
+//        reviewFragment = (ReviewFragment) fm.findFragmentByTag(REVIEW_TAG);
+//        if (reviewFragment == null) {
+//            FragmentTransaction ft = fm.beginTransaction();
+//            reviewFragment = new ReviewFragment();
+//            Bundle a = new Bundle();
+//            a.putString(ReviewFragment.REVIEW_ID, selectedMovie.getId());
+//            reviewFragment.setArguments(a);
+//            ft.add(R.id.review_fragment, reviewFragment, REVIEW_TAG);
+//            ft.commit();
+//        }
+
 
 
         btnLike.setOnClickListener(new View.OnClickListener() {
@@ -230,5 +230,34 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putBoolean(USER_LIKES_MOVIE, userLikesMovie);
         super.onSaveInstanceState(outState);
+    }
+
+    private class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final ArrayList<Fragment> fragmentList = new ArrayList<>();
+        private final ArrayList<String> titleList = new ArrayList<>();
+
+        public ViewPagerAdapter(android.support.v4.app.FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return fragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            fragmentList.add(fragment);
+            titleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return titleList.get(position);
+        }
     }
 }
