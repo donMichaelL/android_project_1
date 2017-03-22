@@ -2,13 +2,12 @@ package com.example.android.popularmovies.Adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.android.popularmovies.Pojo.Movie;
+import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.NetworkUtils.NetworkUtils;
 import com.example.android.popularmovies.R;
 import com.squareup.picasso.Picasso;
@@ -47,6 +46,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         this.movieArrayList = movieArrayList;
         isLoading = notLoadMore;
         notifyDataSetChanged();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        Movie movie = movieArrayList.get(position);
+        return Long.parseLong(movie.getId());
     }
 
     @Override

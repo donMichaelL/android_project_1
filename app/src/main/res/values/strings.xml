@@ -8,5 +8,8 @@
     <string name="download_app">Visit app store to download youTube app or a web browser</string>
     <string name="reviews">Reviews</string>
     <string name="no_comments">No reviews yet.</string>
-    <string name="favourites">FAVOURITES</string>
+    <string name="favourites">Favourites</string>
+    <string name="votes">Votes</string>
+    <string name="popularity">Popularity</string>
+    <string name="no_videos">tv_no_video</string>
 </resources>

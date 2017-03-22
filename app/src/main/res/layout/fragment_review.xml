@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.example.android.popularmovies.Activities.VideoDetailActivity">
+    android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/recyclerview_video"
+        android:id="@+id/recyclerview_reviews"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
     </android.support.v7.widget.RecyclerView>
 
     <TextView
-        android:id="@+id/tv_error_msg_video"
+        android:id="@+id/tv_no_comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_comments"
+        android:visibility="invisible"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/tv_error_msg_review"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/error_msg"
@@ -21,11 +27,11 @@
         android:textSize="20sp"/>
 
     <ProgressBar
-        android:id="@+id/pg_loading_video"
+        android:id="@+id/pg_loading_review"
         android:layout_width="42sp"
         android:layout_height="42sp"
         android:layout_gravity="center"
         android:visibility="invisible"
         />
-
+    
 </FrameLayout>

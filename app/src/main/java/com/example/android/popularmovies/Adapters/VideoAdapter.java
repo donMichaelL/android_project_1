@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.R;
-import com.example.android.popularmovies.Pojo.Video;
+import com.example.android.popularmovies.models.Video;
 
 import java.util.ArrayList;
 
@@ -49,6 +49,12 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoAdapter
     public int getItemCount() {
         if (videoArrayList == null) return 0;
         return videoArrayList.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        Video video = videoArrayList.get(position);
+        return Long.parseLong(video.getId());
     }
 
     public class VideoAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

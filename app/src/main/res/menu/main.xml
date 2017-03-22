@@ -5,13 +5,13 @@
         android:id="@+id/sort_by_popularity"
         android:orderInCategory="1"
         app:showAsAction="never"
-        android:title="POPULARITY"/>
+        android:title="@string/popularity"/>
 
     <item
         android:id="@+id/sort_by_votes"
         android:orderInCategory="1"
         app:showAsAction="never"
-        android:title="VOTES"/>
+        android:title="@string/votes"/>
 
     <item
         android:id="@+id/sort_by_favourite"

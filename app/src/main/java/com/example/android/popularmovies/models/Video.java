@@ -1,20 +1,30 @@
-package com.example.android.popularmovies.Pojo;
+package com.example.android.popularmovies.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Created by Michalis on 2/3/2017.
  */
 
 public class Video implements Parcelable{
+    @SerializedName("id")
     private String id;
+    @SerializedName("iso_639_1")
     private String iso_first;
+    @SerializedName("iso_3166_1")
     private String iso_sec;
+    @SerializedName("key")
     private String key;
+    @SerializedName("name")
     private String name;
+    @SerializedName("site")
     private String site;
+    @SerializedName("size")
     private int size;
+    @SerializedName("type")
     private String type;
 
     public Video(String id, String iso_first, String iso_sec,
